@@ -56,7 +56,7 @@ recent versions of
 Go to a directory of your choice and enter
 
 ```bash
-git clone https://git.opitz-consulting.de/scm/~vze/vagrant-multihost.git my-project
+git clone https://github.com/vzell/vagrant-multihost-provisioning.git my-project
 ```
 
 ```bash
