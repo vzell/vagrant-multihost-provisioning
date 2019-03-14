@@ -1,0 +1,881 @@
+################################################################################
+###                   (1) - Global parameters for all VMs                    ###
+################################################################################
+
+---
+# Empty YAML mapping/hash: comment THIS one when you uncomment at least ONE other global option 
+{}
+
+# Vagrant user.
+# Defaults to `vagrant`.
+#VAGRANT_USER: vagrant
+
+##############################
+# Vagrant provisioning support
+##############################
+
+# If true, run the File provisioner during Vagrant provisioning.
+# Defaults to `true`.
+#RUN_FILE_PROVISIONER: false
+
+# If true, run the Shell provisioner during Vagrant provisioning.
+# Defaults to `true`.
+#RUN_SHELL_PROVISIONER: false
+
+# If true, run the Ansible provisioner during Vagrant provisioning.
+# Defaults to `true`.
+#RUN_ANSIBLE_PROVISIONER: false
+
+##############################
+# Vagrant SSH specific options
+##############################
+
+# If true, X11 forwarding over SSH connections is enabled.
+# Defaults to `true`.
+#SSH_FORWARD_X11: false
+
+# Overwrite host locale in SSH session. Usually, host locale environment variables are passed to the guest.
+# It may cause failures if the guest software do not support host locale. Set default LC_ALL for all boxes.
+# Defaults to `en_US.UTF-8`.
+#LC_ALL: "en_US.UTF-8"
+
+######################################
+# Ansible provisioner specific options
+######################################
+
+# There are two provisioners for Ansible which Vagrant can use:
+#  - Ansible Local Provisioner: ansible_local
+#    The Vagrant Ansible Local provisioner allows you to provision the guest(s) using
+#    Ansible playbooks by executing `ansible-playbook` directly on the controller guest machine.
+#
+#  - Ansible Provisioner:       ansible
+#    The Vagrant Ansible provisioner allows you to provision the guest(s) using
+#    Ansible playbooks by executing `ansible-playbook` from the Vagrant host.
+#    Setup Requirements
+#     o Install Ansible on your Vagrant host (also installable on the Cygwin platform).
+#     o Your Vagrant host should ideally provide a recent version of OpenSSH that supports ControlPersist.
+#
+# The Vagrantfile will try to autodetect the provisioner to use. When running under Cygwin, a Unix system is assumed
+# and the `ansible` provisioner will be selected whereas under native Windows it uses the `ansible_local` provisioner
+# by default.
+# When setting FORCE_LOCAL_RUN to `true`, Ansible will be forced to run locally on the controller
+# guest machine (controller VM) instead of from the Vagrant host machine (provided Ansible is installed).
+# Defaults to `false`.
+#FORCE_LOCAL_RUN: false
+
+# Try to automatically install Ansible on the guest system.
+# Vagrant will try to install (or upgrade) Ansible when one of these conditions are met:
+# - Ansible is not installed (or cannot be found).
+# - The version option ANSIBLE_VERSION below is set to `latest`.
+# - The current Ansible version does not correspond to the version option.
+#
+# You could switch off this setting if you know that your Vagrant box has
+# preinstalled the right Ansible version for your usage.
+# Defaults to `true`.
+#ANSIBLE_INSTALL: false
+
+# How to automatically install Ansible on the guest system
+# The default value of ANSIBLE_INSTALL_MODE is `default`, and any invalid
+# value for this option will silently fall back to the default value.
+# default: Ansible is installed from the operating system package manager.
+#          This mode doesn't support version selection.
+# pip:     Ansible is installed from PyPI with pip package installer.
+#          With this mode, Vagrant will systematically try to install the latest pip version.
+#          With the `pip` mode you can optionally install a specific Ansible release by setting
+#          the version option ANSIBLE_VERSION below.
+# pip_args_only: This mode is very similar to the `pip` mode, with the difference that in this
+#                case no pip arguments will be automatically set by Vagrant. You can use the parameter
+#                ANSIBLE_PIP_ARGS (see below) to specifiy the exact arguments to use.
+# Defaults to `default`.
+#ANSIBLE_INSTALL_MODE: pip_args_only
+
+# For the `ansible` provisioner the expected Ansible version. This option is disabled by default.
+#  - When an Ansible version is defined (e.g. `2.1.6.0`), the Ansible provisioner will be
+#    executed only if Ansible is installed at the requested version.
+#  - When this option is set to `latest`, no version check is applied.
+#
+# With the `ansible_local` provisioner, it is currently possible to use this option to
+# specify which version of Ansible must be automatically installed, but only in combination
+# with the ANSIBLE_INSTALL_MODE set to `pip`.
+# To install a specific Ansible release uncomment the following line when running with `ansible_local`.
+# Defaults to `latest`.
+#ANSIBLE_VERSION: "2.6.1"
+
+# When Ansible is installed via `pip`, this option allows the definition of additional pip
+# arguments to be passed along on the command line (for example, `--index-url`). In case
+# you want to specify the packages which `pip` should install in a requirements file
+# (see https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format)
+# use `-r /vagrant/.requirements.txt` as this filename is currently hardcoded in the Vagrantfile.
+# See also section "(6) - Requirements for pip install"
+# Defaults to `nil`.
+#ANSIBLE_PIP_ARGS: "-r /vagrant/.requirements.txt"
+
+# Should `ansible-galaxy` overwrite roles after initial download and rerunning of the Ansible provisioner.
+# Defaults to `true`.
+#ANSIBLE_GALAXY_OVERWRITE: false
+
+# Ansible's verbosity to obtain detailed logging (false/true/vvv/vvvv)
+# Defaults to `false`.
+#ANSIBLE_VERBOSE: true
+
+# A list of additional ansible-playbook arguments (array of strings).
+# It is an unsafe wildcard that can be used to apply Ansible options that are not (yet)
+# supported by this Vagrant provisioner. As of Vagrant 1.7, raw_arguments has the highest
+# priority and its values can potentially override or break other Vagrant settings.
+# Defaults to `nil`.
+#ANSIBLE_RAW_ARGS: ['--timeout=120']
+
+# Perform all the Ansible playbook tasks as another user, different from the user used to log into the guest system.
+# Defaults to `true`.
+#ANSIBLE_BECOME: false
+
+# Set the default username to be used by the Ansible become privilege escalation mechanism.
+# Defaults to `root`.
+#ANSIBLE_BECOME_USER: root
+
+# Name of the Ansible playbook. The actual playbook will be generated in the ansible subfolder
+# of the project with this name prefixed by `.vagrant-`
+# Defaults to `site.yml`.
+#ANSIBLE_PLAYBOOK: onenode.yml
+
+# Set of machines or groups from the inventory file to further control which hosts are affected.
+# Defaults to `all`.
+#ANSIBLE_LIMIT: nodes
+
+# The path of a file containing the password used by Ansible Vault.
+# Defaults to `nil`.
+#ANSIBLE_VAULT_PASSWORD_FILE: vault_password_file
+
+# Only plays, roles and tasks tagged with these values will be executed by `ansible-playbook`
+# A comma separated tag list can be provided
+#ANSIBLE_TAGS: vzell.yum,dotconfigfiles
+
+# Only plays, roles and tasks that do not match these values will be executed by `ansible-playbook`
+# A comma separated tag list can be provided
+#ANSIBLE_SKIP_TAGS: always
+
+# The task name where the `ansible-playbook` execution will start
+# This does not currently work when task names have blanks in their name on Cygwin systems
+#ANSIBLE_START_AT_TASK: "Add firewalld rules for services from vars"
+
+###############################################
+# Plugin installation and configuration options
+###############################################
+
+# Vagrant Proxy Plugin installation and configuration
+# Defaults to `false`.
+#USE_PROXY: true
+
+# Vagrant Hostmanager Plugin installation and configuration
+# Defaults to `true`.
+#USE_HOSTMANAGER: true
+
+####################
+# VM default options
+####################
+
+# This configures what box the machine will be brought up against. The value here should be the name of
+# an installed box or a shorthand name of a box in HashiCorp's Vagrant Cloud.
+# Defaults to `centos/7`.
+#box: vzell/packer-ol76
+
+# The URL that the configured box can be found at. If the above `box` is a shorthand to a box in HashiCorp's
+# Vagrant Cloud then this value does not need to be specified. Otherwise, it should point to the proper place
+# where the box can be found if it is not installed. This can also be an array of multiple URLs.
+# The URLs will be tried in order. The URLs can also be local files by using the `file://` scheme.
+# Defaults to use the Vagrant Cloud - https://app.vagrantup.com/boxes/search
+#box_url: https://volkerzell.de/vagrant/packer-ol76-0.9.0.box
+
+# The version of the box to use.  This can contain an arbitrary list of constraints, separated by commas,
+# such as: >= 1.0, < 1.5. When constraints are given, Vagrant will use the latest available box satisfying these constraints.
+# Defaults to `>= 0` (the latest version available).
+#box_version: "1811.02"
+
+# If true, Vagrant will check for updates to the configured box on every vagrant up.
+# If an update is found, Vagrant will tell the user. Updates will only be checked for boxes that properly
+# support updates (boxes from HashiCorp's Vagrant Cloud or some other versioned box).
+# Defaults to `true`.
+#box_check_update: false
+
+# If true, Vagrant will not load the the settings found inside a boxes Vagrantfile, if present.
+# Defaults to `false`.
+#box_vagrantfile_ignore: true
+
+# VM groups enable the user to create ad hoc groups of VMs, and to manage and perform functions
+# on them collectively, as well as individually. A VM can be part of one or multiple groups (separated by `,`).
+# Groups can also be nested having a group hierarchy. A groupname must start with a `/`, nested groups look like
+# Unix directory strutures.
+# Defaults to `<Name of your project directory>`.
+#vm_groups: "/Test Group,/Test Group1/Test Group2"
+
+# VirtualBox machines are started in headless mode, meaning there is no UI for the machines visible on the host machine.
+# Common use cases for wanting a UI include wanting to see a browser that may be running in the machine, or debugging a strange boot issue.
+# Defaults to `false`.
+#vm_gui: true
+
+# Sets the amount of RAM, in MB, that the virtual machine should allocate for itself from the host.
+# Defaults to `1024`
+#vm_memory: 2048
+
+# Sets the number of virtual CPUs for the virtual machine.
+# Defaults to `1`
+#vm_cpus: 2
+
+# Domainname of created hosts.
+# Defaults to `nil`.
+#domain: oc.de
+
+# Whether to check the correct VirtualBox guest additions version on each start (where start is not resuming a box).
+# Defaults to `true`.
+#vb_guest_auto_update: false
+
+# By default Ansible expects python 2.x installed on the Ansible host. This is useful for systems with more than one
+# Python installed or not located at /usr/bin/python such as *BSD, or where /usr/bin/python is not a 2.x series Python.
+# Defaults to `nil`.
+#python_interpreter: "/usr/bin/python3"
+
+# VBoxManage Customizations. VBoxManage is a utility that can be used to make modifications to VirtualBox virtual machines from the command line.
+# Vagrant exposes a way to call any command against VBoxManage just prior to booting the machine.
+# When specifying option names leave out the "--" prefix from the option names found at https://www.virtualbox.org/manual/UserManual.html#vboxmanage-modifyvm
+# Values MUST be enclosed in quotes.
+# Defaults to `nil`.
+#vm_options:
+#  - { vram:      "128" }
+#  - { rtcuseutc: "on" }
+#  - { ioapic:    "on" }
+
+# Specifies the name of the SATA Controller which should be created if it doesn't exist in the box.
+# Most of the boxes use the name `SATA Controller`, but some boxes out there instead have a controller named `SATAController`.
+# Defaults to `SATA Controller`.
+#sata_controller: "SATAController"
+
+# List of disks which should be attached to a SATA controller.
+# First parameter specifies the `SATA port` to attach the disk, second parameter specifies the `disksize` in GB.
+# Defaults to `nil`.
+#vm_disks:
+#  - { 1: 2000 }
+#  - { 2: 2000 }
+
+# Synced folders enable Vagrant to sync a folder on the host machine to the guest machine.
+# By default, Vagrant mounts the synced folders with the owner/group set to the SSH user and any parent folders set to root.
+# By default, Vagrant will share your project directory (the directory with the Vagrantfile) to `/vagrant`.
+# Options:
+#   src (string)    - Path to a directory on the host machine. If the path is relative, it is relative to the project root.
+#   dest: (string)  - Absolute path of where to share the folder within the guest machine.
+#                     This folder will be created (recursively, if it must) if it does not exist.
+#   options: (hash) - See the documentation at https://www.vagrantup.com/docs/synced-folders/
+#                     what you can use for the `options` clause. (optional)
+#     :type: (string)         - The type of synced folder. If this is not specified, Vagrant will automatically
+#                               choose the best synced folder option for your environment.
+#     :create: (boolean)      - If true, the host path will be created if it does not exist. Defaults to `false`.
+#     :disabled: (boolean)    - If true, this synced folder will be disabled and will not be setup. Defaults to `false`.
+#     :owner: (string)        - The user who should be the owner of this synced folder. By default this will be the SSH user.
+#     :group: (string)        - The group that will own the synced folder. By default this will be the SSH user.
+#     :id: (string)           - The name for the mount point of this synced folder in the guest machine.
+#                               This shows up when you run mount in the guest machine.
+#     :mount_options: (array) - A list of additional mount options to pass to the mount command.
+# There are also `synced folder type` specific options. All suboptions must start with a `:`, eg. `:type: virtualbox`.
+# Example:
+#   synced_folders:
+#     - src: "D:/temp/netbox"
+#       dest: "/media/netbox"
+#       options:
+#         :type: rsync
+#     - src: "."
+#       dest: "/vagrant"
+#       options:
+#         :type: virtualbox
+#         :mount_options: ['dmode=0700', 'fmode=0600']
+#     - src: "C:/temp/books"
+#       dest: "/books"
+#       options:
+#         :owner: "vagrant",
+#         :group: "vagrant",
+#         :mount_options: ['uid=1234', 'gid=1234']
+# Defaults to `nil`.
+#synced_folders:
+#  - src: "D:/temp/netbox"
+#    dest: /media/netbox
+#    options:
+#      :type: virtualbox
+
+# The Vagrant file provisioner allows you to upload a file or directory from the host machine to the guest machine.
+# The file/folder is uploaded as the SSH user over SCP, so this location must be writable to that user.
+# Options:
+#   source (string)      - Is the local path of the file or directory to be uploaded.
+#   destination (string) - Is the remote path on the guest machine where the source will be uploaded to.
+# Example:
+#   file_provisioning:
+#    - source: "~/.gitconfig"
+#      destination: ".gitconfig"
+#    - source: "~/path/to/host/folder"
+#      destination: "$HOME/remote/newfolder"
+# Defaults to `nil`.
+#file_provisioning:
+#  - source: "~/.gitconfig"
+#    destination: ".gitconfig"
+
+# The Vagrant Shell provisioner allows you to upload and execute a script within the guest machine.
+# An `inline` script is a script that is given to Vagrant directly within the Vagrantfile.
+# An `external` script is uploaded either from the host filesystem or you can pass in its URL.
+# To run a script already available on the guest you can use an inline script to invoke the remote script on the guest.
+# For POSIX-like machines, the shell provisioner executes scripts with SSH.
+# By default, provisioners are only run once, during the first `vagrant up` since the last vagrant destroy,
+# unless the `--provision` flag is set. Optionally, you can configure provisioners to run on every up or reload.
+# They will only be not run if the `--no-provision` flag is explicitly specified.
+# There are four different combinations of shell provisioners which can be configured. All accept a list of shell scripts.
+#   inline_shell:         - Run only once
+#   inline_shell_always:  - Run on every `up` or `reload`
+#   scripts:              - Run only once
+#   scripts_always:       - Run on every `up` or `reload`
+# Options:
+#   name: (string)   - This value will be displayed in the output so that identification by the user
+#                      is easier when many shell provisioners are present. (optional)
+#   inline: (string) - Specifies the shell command(s) inline to execute on the remote machine.
+#                      You can use the YAML multiline string syntax `inline: |` for lots of text lines.  
+#   script: (string) - Path to a shell script to upload and execute. It can be a script relative
+#                      to the project Vagrantfile or a remote script (like a gist URL).
+#   args: (string or array) - Arguments to pass to the shell script when executing it as a single string. (optional)
+#                             These arguments must be written as if they were typed directly on the command
+#                             line, so be sure to escape characters, quote, etc. as needed.
+#                             You may also pass the arguments in using an array. In this case, Vagrant will handle quoting for you.
+#  One of `inline` or `script` is required depending on the shell provisioner type.
+# Example:
+#   inline_shell:
+#     - name: "INLINE_SHELL: Hello World inline script (just once)"
+#       inline: |
+#         echo This one is $1
+#         echo This two is $2
+#         for i in 1 2 3; do
+#           echo i = $i
+#         done
+#       args:
+#         - "hello, \ world \\ check the . and file-URL file://xyz/dir + \"string\"  + 'string' + `uname -a` !"
+#         - "--param-name + $1"
+#   inline_shell_always:
+#     - inline: "/bin/sh /path/to/the/script/already/on/the/guest.sh"
+#   scripts:
+#     - script: "https://example.com/provisioner.sh"
+#   scripts_always:
+#     - script: "./scripts/test1.sh"
+#     - name: Test2
+#       script: "./scripts/test2.sh"
+#       args: "'hello, world' p2 p3"
+#     - name: Test2
+#       script: "./scripts/test2.sh"
+#       args:
+#         - "hello, world"
+#         - p2
+#         - p3
+
+# Defaults to `nil`.
+#inline_shell:
+#  - name: "INLINE_SHELL (GLOBAL): Hello World GLOBAL inline script (just once)"
+#    inline: |
+#      echo This one is $1
+#      echo This two is $2
+#    args:
+#      - "hello, \ world \\ check the . and URL file://xyz/dir + \"string\"  + 'string' + `uname -a` !"
+#      - "--param-name + $1"
+
+# Defaults to `nil`.
+#inline_shell_always:
+#  - name: "INLINE_SHELL_ALWAYS (GLOBAL): Hello World GLOBAL inline script"
+#    args:
+#      - "hello, world!"
+#      - "--param-name"
+#    inline: |
+#      echo one is $1
+#      echo two is $2
+#      id
+#      pwd
+#      hostname
+#      for i in 1 2 3; do
+#        echo i = $i
+#      done
+
+# Defaults to `nil`.
+#inline_shell_never:
+#  - name: "bootstrap"
+#    inline: |
+#      echo one is $1
+#      echo two is $2
+#      id
+#      pwd
+#      hostname
+#      for i in 1 2 3; do
+#        echo i = $i
+#      done
+#    args:
+#      - "hello, world!"
+#      - "--param-name"
+
+# Defaults to `nil`.
+#scripts:
+#  - script: ./scripts/test1.sh
+#  - name: "SCRIPTS (GLOBAL): ./scripts/test2.sh"
+#    script: ./scripts/test2.sh
+#    args: "'hello, world' p2 p3"
+
+# Defaults to `nil`.
+#scripts_always:
+#  - script: ./scripts/test1.sh
+#  - name: "SCRIPTS_ALWAYS (GLOBAL): ./scripts/test2.sh"
+#    script: ./scripts/test2.sh
+#    args: "'hello, world' p2 p3"
+
+# Defaults to `nil`.
+#scripts_never:
+#  - name: "bootsrap-script"
+#    script: ./scripts/bootstrap.sh
+...
+
+################################################################################
+###        (2) - List of virtual machines to be created by Vagrant           ###
+################################################################################
+
+---
+# Empty YAML array: comment THIS one when you uncomment/specify at least ONE VM specification below.
+[]
+
+# This configuration section configures a list of VirtualBox VMs which should be created by Vagrant.
+# Every host specification starts with the `hostname` the machine should have. The hostname will be set on boot.
+# In case of `multihost environments` and Ansible provisioning in `ansible_local` mode
+# the Ansible controlhost MUST be the LAST list entry.
+# Defaults to `ansiblehost`.
+# Example:
+#   - hostname: node1
+#   - hostname: node2
+#   - hostname: ansiblehost      # Ansible controlhost MUST be the last list entry in multihost environments
+
+# For EVERY host specification you can optionally have a hash of options which correspond
+# to the same named options from the global section. Options from the global section will be OVERWRITTEN
+# when specified here, EXCEPT for `vm_options` and `vm_disks` in which case the options are MERGED.
+# Additionally there exist the following NEW options:
+
+# private_networks:
+# Vagrant `private networks` allow you to access your guest machine by some address that is not publicly
+# accessible from the global internet. In general, this means your machine gets an address in the private address space.
+# Multiple machines within the same private network (also usually with the restriction that they're backed by the same provider)
+# can communicate with each other on private networks. By default, private networks are `host-only networks`.
+# The Vagrant VirtualBox provider supports using the private network as a VirtualBox `internal network`.
+# Options:
+#   ip          - Either an IP/IPv6 address or the string `dhcp`. (optional, default `dhcp`)
+#   netmask     - The network mask. (optional, default `255.255.255.0`)
+#   mac         - The MAC adress attached to the network device (optional)
+#                 Several notations are accepted, including "Linux-style" (00:11:22:33:44:55) and "Windows-style" (00-11-22-33-44-55)
+#   auto_config - Vagrant will not configure this network interface if set to `false` (optional, default `true`)
+#   intnet      - Either `true` for the default internal network, or specify the name of the internal network (optional)
+# Defaults to `nil`.
+# Example:
+#   private_networks:
+#     - ip: dhcp
+#     - ip: 192.168.56.110
+#     - ip: 10.2.2.10
+#       intnet: true
+#     - ip: 10.0.19.10
+#       intnet: myintnet
+
+# public_networks:
+# Vagrant `public networks` are less private than private networks, and the exact meaning
+# actually varies from provider to provider, hence the ambiguous definition. The idea is
+# that while private networks should never allow the general public access to your machine, public networks can.
+# The Vagrant VirtualBox provider supports using the public network as a VirtualBox `bridged network`.
+# Options:
+#   ip          - Either an IP/IPv6 address or the string `dhcp`.
+#   auto_config - Vagrant will not configure this network interface if set to `false` (optional, default `true`)
+# Defaults to `nil`.
+# Example:
+#   public_networks:
+#     - ip: 192.168.2.90
+
+# forwarded_ports
+# Vagrant `forwarded ports` allow you to access a port on your host machine and have all data forwarded
+# to a port on the guest machine, over either TCP or UDP.
+# Options:
+#   guest: (int) - The port on the guest that you want to be exposed on the host. This can be any port.
+#   host: (int)  - The port on the host that you want to use to access the port on the guest.
+#                  This must be greater than port 1024 unless Vagrant is running as root (which is not recommended).
+# Defaults to `nil`.
+# Example:
+#   forwarded_ports:
+#     - { guest: 80, host: 8080 }
+#     - { guest: 90, host: 9090 }
+
+# forwarded_ssh_port:
+# Vagrant uses this entry for SSH access into the guest machine instead of the
+# default port 2222 for the first machine and an arbitrary port for the rest
+# of the machines to avoid conflicts.
+# Options:
+#   guest: (int) - The port on the guest where the SSH daemon is listening. (optional, defaults to `22`)
+#   host: (int)  - The port on the host that you want to use to access the port on the guest. (optional, see comment above)
+#                  This must be greater than port 1024 unless Vagrant is running as root (which is not recommended).
+# Defaults to `nil`.
+# Example:
+#   forwarded_ssh_port:
+#     host: 11110
+
+# aliases:
+# When using the `hostmanager` plugin you can specify a list of alias name(s) for the machine which should be
+# included in the /etc/hosts file.
+# Defaults to `nil`.
+# Example:
+#   aliases:
+#     - controlhost
+#     - controlhost.oc.de
+#     - dnshost dnshost.oc.de
+
+# postup_message:
+# A message to show after vagrant up. This will be shown to the user and is useful for containing
+# instructions such as how to access various components of the development environment.
+# You can use the YAML multiline string syntax `postup_message: |` for lots of text lines.
+# Defaults to `nil`.
+# Example:
+#   postup_message: |
+#     message line 1
+#     message line 2
+
+
+# Hostname specifications.
+#- hostname: node1
+#  private_networks:
+#    - ip: 192.168.56.121
+
+#- hostname: node2
+#  private_networks:
+#    - ip: 192.168.56.122
+
+#- hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
+#  private_networks:
+#    - ip: 192.168.56.110
+...
+
+################################################################################
+###                  (3) - Ansible inventory groupings                       ###
+################################################################################
+
+---
+# Empty YAML mapping/hash: comment THIS one when you uncomment/specify the `groupings:` option 
+{}
+
+# Vagrant will autogenerate the Ansible inventory files in `INI`-format in the ansible subfolder of this project
+# for the different Ansible provisioning modes, from the host list in the above hosts section of this document:
+# For `ansible_local` mode: ansible/.vagrant-local-inventory.ini
+#   node1       ansible_ssh_user=vagrant ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key
+#   node2       ansible_ssh_user=vagrant ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key
+#   ansiblehost ansible_connection=local
+#
+# For `ansible` mode:       ansible/.vagrant-inventory.ini
+#   node1       ansible_ssh_host=127.0.0.1 ansible_ssh_port=11121 ansible_ssh_user=vagrant ansible_ssh_private_key_file='../.vagrant/insecure_private_key'
+#   node2       ansible_ssh_host=127.0.0.1 ansible_ssh_port=11122 ansible_ssh_user=vagrant ansible_ssh_private_key_file='../.vagrant/insecure_private_key'
+#   ansiblehost ansible_ssh_host=127.0.0.1 ansible_ssh_port=11110 ansible_ssh_user=vagrant ansible_ssh_private_key_file='../.vagrant/insecure_private_key'
+#
+# There is an entry for each virtual machine to be created by Vagrant with all the necessary connection details.
+# You can can create groupings out of these, which are used in classifying systems and deciding
+# what systems you are controlling at what times and for what purpose during Ansible provisioning.
+# See also https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html and
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html
+# Vagrant will APPEND the contents of the inventory grouping specified here to the autogenerated inventory files.
+
+## Inventory grouping INI syntax:
+#
+# Group            - Headings in brackets are group names
+#
+# Example:
+#   [webservers]
+#   foo.example.com
+#   bar.example.com
+#   
+#   [dbservers]
+#   one.example.com
+#   two.example.com
+#   three.example.com
+#
+# Groups of groups - You can make groups of groups using the `:children` suffix
+#
+# Example:
+#   [datacenter:children]
+#   webservers
+#   dbservers
+
+
+# You can use the YAML multiline string syntax `groupings: |` for lots of text lines.
+#groupings: |
+
+#  [ansible]
+#  ansiblehost
+
+#  [nodes]
+#  node[1:2]
+
+#  [datacenter:children]
+#  ansible
+#  nodes
+...
+
+################################################################################
+###   (4) - List of required roles for installation with `ansible-galaxy`    ###
+################################################################################
+
+---
+# Empty YAML array: comment THIS one when you uncomment/specify at least ONE Galaxy role.
+[]
+
+# Vagrant will use the `ansible-galaxy` command to download roles from the Galaxy website at
+# https://galaxy.ansible.com/ or via a URL from a repository within a git based SCM.
+# Vagrant will autogenerate the Ansible requirements file in the ansible subfolder of this project.
+# See also https://docs.ansible.com/ansible/latest/reference_appendices/galaxy.html#installing-roles
+#
+## `ansible-galaxy` requirements file syntax:
+#
+# Options:
+#   src: The source of the role. Use the format username.role_name, if
+#        downloading from Galaxy; otherwise, provide a URL pointing to a
+#        repository within a git based SCM. See the examples below. This is a
+#        required attribute.
+#
+#   scm: Specify the SCM. As of this writing only git or hg are supported. See
+#        the examples below. Defaults to git.
+#
+#   version: The version of the role to download. Provide a release tag value,
+#            commit hash, or branch name. Defaults to master.
+#
+#   name: Download the role to a specific name. Defaults to the Galaxy name when
+#         downloading from Galaxy, otherwise it defaults to the name of the
+#         repository.
+#
+#   include: Path to another requirements file.
+#
+# Example:
+#   # From galaxy:
+#   - src: yatesr.timezone
+#
+#   # From GitHub:
+#   - src: https://github.com/bennojoy/nginx
+#
+#   # From GitHub, overriding the name and specifying a specific tag:
+#   - src: https://github.com/bennojoy/nginx
+#     version: master
+#     name: nginx_role
+#
+#   # From GitHub, overriding the name and specifying a commit hash:
+#   - src: git+https://github.com/geerlingguy/ansible-role-composer.git
+#     version: 775396299f2da1f519f0d8885022ca2d6ee80ee8
+#     name: composer
+#
+#   # From a webserver, where the role is packaged in a tar.gz:
+#   - src: https://some.webserver.example.com/files/master.tar.gz
+#     name: http-role
+#
+#   # From Bitbucket:
+#   - src: git+https://bitbucket.org/willthames/git-ansible-galaxy
+#     version: v1.4
+#
+#   # From Bitbucket, alternative syntax and caveats:
+#   - src: https://bitbucket.org/willthames/hg-ansible-galaxy
+#     scm: hg
+#
+#   # From GitLab or other git-based scm, using git+ssh:
+#   - src: git@gitlab.company.com:mygroup/ansible-base.git
+#     scm: git
+#     version: "0.1"  # quoted, so YAML doesn't parse this as a floating-point value
+#
+#   # Role includes pull in roles from other files.
+#   - include: <path_to_requirements>/webserver.yml
+
+
+#- src: git+https://github.com/vzell/yum.git
+#  name: vzell.yum
+#- src: git+https://github.com/vzell/dotfiles.git
+#  name: vzell.dotfiles
+...
+
+################################################################################
+###                      (5) - Ansible playbook(s)                           ###
+################################################################################
+
+---
+# Empty YAML mapping/hash: comment THIS one when you uncomment/specify at least ONE playbook by name 
+{}
+
+# Playbooks are Ansible’s configuration, deployment, and orchestration language. They can describe a
+# policy you want your remote systems to enforce, or a set of steps in a general IT process.
+# See https://docs.ansible.com/ansible/latest/user_guide/playbooks.html
+#
+# Syntax:
+#
+# Mapping(s) of <playbook name>.yml: <content>
+#
+# Example:
+#   site.yml: |
+#     ---
+#     - hosts: elk
+#       become: true
+#       roles:
+#         - { role: vzell.yum, tags: vzell.yum }
+#
+#         - { role: vzell.dotfiles, tags: vzell.dotfiles }
+#
+#         - role: vzell.ansible-role-java
+#           tags: java
+#
+#         - role: geerlingguy.elasticsearch
+#           vars:
+#             elasticsearch_network_host: "0.0.0.0"
+#           tags: elasticsearch
+#
+#         - role: geerlingguy.logstash
+#           tags: logstash
+#
+#         - role: geerlingguy.filebeat
+#           tags: filebeat
+#
+#         - role: geerlingguy.kibana
+#           vars:
+#             kibana_server_host: "0.0.0.0"
+#           tags: kibana
+#
+#         - role: vzell.ansible-role-firewalld
+#           vars:
+#             firewalld_allow_ports:
+#               - { port: "5601/tcp",  permanent: true, state: "enabled"}
+#               - { port: "9200/tcp",  permanent: true, state: "enabled"}
+#           tags: firewalld
+#     ...
+#
+#   reset.yml: |
+#     ---
+#     - hosts: elk
+#       become: true
+#       roles:
+#         - { role: vzell.reset, tags: vzell.reset }
+#     ...
+
+
+# For `<content>` you SHOULD use the YAML multiline string syntax `<playbook name>.yml: |`.
+#site.yml: |
+#  ---
+#  - hosts: ansiblehost
+#    become: true
+#    roles:
+#      - { role: vzell.yum,      tags: vzell.yum }
+#      - { role: vzell.dotfiles, tags: vzell.dotfiles }
+ 
+#  - hosts: nodes
+#    become: true
+#    roles:
+#      - { role: vzell.yum,      tags: vzell.yum }
+#      - { role: vzell.dotfiles, tags: vzell.dotfiles }
+ 
+#  - hosts: 127.0.0.1
+#    become: false
+#    tasks:
+#      - name: Ansible create file if it doesn't exist example
+#        file:
+#          path: "/misc/devops_server.txt"
+#          state: touch
+#          mode: 0644
+#    tags:
+#      - cygwin
+#  ...
+...
+
+################################################################################
+###           (6) - Requirements for `pip install` (optional)                ###
+################################################################################
+
+---
+# Empty YAML mapping/hash: comment THIS one when you uncomment/specify the `requirements:` option.
+{}
+
+# In Ansible `ansible-local` mode provisioning Ansible can be installed with the `pip` package installer.
+# pip supports installing from PyPI, version control, local projects, and directly from distribution files.
+# `Requirements files` are files containing a list of items to be installed using `pip install`.
+#
+## Syntax
+#
+# One line per requirement - https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+#
+## Example:
+#
+# requirements: |
+#   ###### Installing from Git, Mercurial, Subversion and Bazaar ######
+#   #   pip detects the type of VCS using url prefixes: 'git+', 'hg+', 'bzr+', 'svn+'
+#   -e  git+https://github.com/ansible/ansible.git#egg=devel
+#   #
+#   ###### Requirements without Version Specifiers ######
+#   virtualenv
+#   nose
+#   nose-cov
+#   beautifulsoup4
+#   #
+#   ###### Requirements with Version Specifiers ######
+#   #   See https://www.python.org/dev/peps/pep-0440/#version-specifiers
+#   docopt == 0.6.1             # Version Matching. Must be version 0.6.1
+#   keyring >= 4.1.1            # Minimum version 4.1.1
+#   coverage != 3.5             # Version Exclusion. Anything except version 3.5
+#   Mopidy-Dirble ~= 1.1        # Compatible release. Same as >= 1.1, == 1.*
+#   #
+#   ###### Refer to other requirements files ######
+#   #-r other-requirements.txt
+#   #
+#   ###### A particular file ######
+#   #./downloads/numpy-1.9.2-cp34-none-win32.whl
+#   #http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3.dev1820+49a8884-cp34-none-win_amd64.whl
+
+
+# You can use the YAML multiline string syntax `requirements |` for lots of text lines.
+# requirements: |
+#   -e  git+https://github.com/ansible/ansible.git#egg=devel
+#   virtualenv
+...
+
+################################################################################
+###            (7) - Ansible configuration files (optional)                  ###
+################################################################################
+
+---
+# Empty YAML mapping/hash: comment THIS one when you uncomment/specify the configuration file options 
+{}
+
+# Certain settings in Ansible are adjustable via a configuration file,
+# see https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings
+# Vagrant autogenerates default MINIMAL Ansible configuration files in the ansible folder of this project
+# for the two different Ansible provisioning modes.
+# For `ansible_local` mode: ansible/.ansible-local.cfg
+#   [defaults]
+#   # Disable SSH key host checking
+#   host_key_checking = no
+#   # Additional paths to search for roles, colon separated
+#   roles_path = ./ansible/roles
+#   
+#   [ssh_connection]
+#   ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes
+#
+# For `ansible` mode:       ansible/.ansible.cfg     - (when the underlying system is Cygwin)
+#   [defaults]
+#   # Disable SSH key host checking
+#   host_key_checking = no
+#   # Additional paths to search for roles, colon separated
+#   roles_path = ./ansible/roles
+#   
+#   [ssh_connection]
+#   # ssh arguments to use (`ControlMaster=no` is needed for Ansible to work on Cygwin).
+#   # Needs to be explicitly set by Vagrant with ansible.raw_ssh_args in Vagrantfile.
+#   # Vagrant uses ANSIBLE_SSH_ARGS for Cygwin which has higher precedence than Ansibel configuration options.
+#   ssh_args = -o ControlMaster=no
+#
+# You can overwrite these autogenerated files with your own versions by specifiying YAML mappings.
+# Syntax:
+#
+# Mapping(s) of <ansible config file>.yml: <content>
+
+
+# You can use the YAML multiline string syntax `.ansible-local.cfg: |` for lots of text lines.
+# .ansible-local.cfg: |
+#   <your own content here, see https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings>
+
+# You can use the YAML multiline string syntax `.ansible.cfg: |` for lots of text lines.
+# .ansible.cfg: |
+#   <your own content here, see https://docs.ansible.com/ansible/latest/reference_appendices/config.html#ansible-configuration-settings>
+...
