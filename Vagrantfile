@@ -70,6 +70,9 @@ playbooks           = vagrant_conf[4]
 pip_requirements    = vagrant_conf[5]
 ansible_cfgs        = vagrant_conf[6]
 
+pip_requirements = nil if pip_requirements == {}
+ansible_cfgs     = nil if ansible_cfgs == {}
+
 # If no hostname is specified in the configuration file use the name `ansiblehost`
 if hosts.empty?
   hosts = [{"hostname"=>"ansiblehost"}]
