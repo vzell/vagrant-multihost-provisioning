@@ -1152,7 +1152,7 @@ The `sixth YAML document section` specifies the requirements for `pip install`.
 #   #http://wxpython.org/Phoenix/snapshot-builds/wxPython_Phoenix-3.0.3.dev1820+49a8884-cp34-none-win_amd64.whl
 
 
-# You can use the YAML multiline string syntax `requirements |` for lots of text lines.
+# You can use the YAML multiline string syntax `requirements: |` for lots of text lines.
 requirements: |
   -e  git+https://github.com/ansible/ansible.git#egg=devel
   virtualenv
