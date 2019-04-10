@@ -141,7 +141,7 @@ between the nodes is available.
 
 NOTE that in the case of a multihost setup you need to specify the Ansible
 controlhost (whatever you name it) as the LAST ONE in the list of VMs if you
-want to provision with Ansible.
+want to provision with Ansible in *ansible_local mode*.
 
 ```Yaml
 --- # (1) Global parameters for all VMs to be created by Vagrant
