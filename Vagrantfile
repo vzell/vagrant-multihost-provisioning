@@ -853,6 +853,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       i = i + 1
 
       # Initialize host specific environment from Vagrant configuration or use sensible defaults
+      controlhost            = set_host_default(global, host, 'controlhost',            false)
       box                    = set_host_default(global, host, 'box',                    'centos/7')
       box_url                = get_config_parameter(host, global, 'box_url')
       box_version            = get_config_parameter(host, global, 'box_version')
@@ -902,8 +903,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Synched folders setup
       synced_folders(node.vm, host, global)
-      if run_locally? and i == hosts.length
-      # Mandatory in "ansible_local" mode for multihost environments
+      if run_locally? and (controlhost or i == hosts.length)
+        # Mandatory in "ansible_local" mode for multihost environments with Ansible controlhost
         node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", mount_options: ['dmode=0775', 'fmode=0664']
         node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", mount_options: ['dmode=0700', 'fmode=0600']
       end

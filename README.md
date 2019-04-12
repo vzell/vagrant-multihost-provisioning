@@ -139,9 +139,10 @@ An example of a trivial *multihost* VM setup follows. In this case the VMs will
 be setup with a VirtualBox Host-Only adapter given the specified IPs. SSH setup
 between the nodes is available.
 
-NOTE that in the case of a multihost setup you need to specify the Ansible
+NOTE that in the case of a *multihost* setup you need to specify the Ansible
 controlhost (whatever you name it) as the LAST ONE in the list of VMs if you
-want to provision with Ansible in *ansible_local mode*.
+want to provision with Ansible in *ansible_local mode* AND the **controlhost**
+attribute MUST be set to `true`.
 
 ```Yaml
 --- # (1) Global parameters for all VMs to be created by Vagrant
@@ -166,6 +167,7 @@ vm_options:
     - ip: 192.168.56.122
 
 - hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
+  controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
   box: centos/7
   private_networks:
     - ip: 192.168.56.110
@@ -839,8 +841,15 @@ list element, other settings (see below) are optional:
 #     message line 1
 #     message line 2
 
+# controlhost:
+# In `ansible_local` provisioning mode this entry MUST be used with a value of `true` on the LAST host
+# list entry for multihost environments. For SINGLE host environments it's optional.
+# Defaults to `false`.
+# Example:
+#   controlhost: true
 
-# Hostname specifications.
+
+# Hostname specifications:
 - hostname: node1
   private_networks:
     - ip: 192.168.56.121
@@ -850,6 +859,7 @@ list element, other settings (see below) are optional:
     - ip: 192.168.56.122
 
 - hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
+  controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
   private_networks:
     - ip: 192.168.56.110
 ...

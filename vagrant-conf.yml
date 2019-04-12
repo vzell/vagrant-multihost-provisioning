@@ -535,8 +535,15 @@
 #     message line 1
 #     message line 2
 
+# controlhost:
+# In `ansible_local` provisioning mode this entry MUST be used with a value of `true` on the LAST host
+# list entry for multihost environments. For SINGLE host environments it's optional.
+# Defaults to `false`.
+# Example:
+#   controlhost: true
 
-# Hostname specifications.
+
+# Hostname specifications:
 #- hostname: node1
 #  private_networks:
 #    - ip: 192.168.56.121
@@ -546,6 +553,7 @@
 #    - ip: 192.168.56.122
 
 #- hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
+#  controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
 #  private_networks:
 #    - ip: 192.168.56.110
 ...
