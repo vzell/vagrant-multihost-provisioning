@@ -515,6 +515,11 @@ vm_groups: "/Test Group,/Test Group1/Test Group2"
 # Defaults to `false`.
 vm_gui: true
 
+# Vagrant by default will make "smart" decisions to enable/disable the NAT DNS proxy.
+# If this is set to `false`, then the DNS proxy will not be enabled, and it is up to the end user to do it.
+# Defaults to `true`.
+vm_auto_nat_dns_proxy: false
+
 # Sets the amount of RAM, in MB, that the virtual machine should allocate for itself from the host.
 # Defaults to `1024`
 vm_memory: 2048

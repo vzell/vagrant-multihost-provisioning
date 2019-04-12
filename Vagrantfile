@@ -862,6 +862,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb_guest_auto_update   = set_host_default(global, host, 'vb_guest_auto_update',   true)
       sata_controller        = set_host_default(global, host, 'sata_controller',        'SATA Controller')
       vm_gui                 = set_host_default(global, host, 'vm_gui',                 false)
+      vm_auto_nat_dns_proxy  = set_host_default(global, host, 'vm_auto_nat_dns_proxy',  true)
       vm_name                = set_host_default(global, host, 'vm_name',                host['hostname'])
       vm_groups              = set_host_default(global, host, 'vm_groups',              '/' + File.basename(Dir.getwd))
       vm_memory              = set_host_default(global, host, 'vm_memory',              1024)
@@ -939,6 +940,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # This options changes the properties of a registered virtual machine which is not running.
         # Standard Virtualbox VM options
         vb.gui = vm_gui
+        vb.auto_nat_dns_proxy = vm_auto_nat_dns_proxy
         vb.customize ["modifyvm", :id, "--name",   vm_name]
         vb.customize ["modifyvm", :id, "--groups", vm_groups]
         vb.customize ["modifyvm", :id, "--memory", vm_memory]
