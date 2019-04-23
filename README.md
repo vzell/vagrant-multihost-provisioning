@@ -633,8 +633,14 @@ file_provisioning:
 # There are four different combinations of shell provisioners which can be configured. All accept a list of shell scripts.
 #   inline_shell:         - Run only once
 #   inline_shell_always:  - Run on every `up` or `reload`
+#   inline_shell_never:   - If you have an optional provisioner that you want to mention to the user in a "post up message"
+#                           or that requires some other configuration before it is possible,
+#                           then call this with `vagrant provision --provision-with <name>`.
 #   scripts:              - Run only once
 #   scripts_always:       - Run on every `up` or `reload`
+#   scripts_never:        - If you have an optional provisioner that you want to mention to the user in a "post up message"
+#                           or that requires some other configuration before it is possible,
+#                           then call this with `vagrant provision --provision-with <name>`.
 # Options:
 #   name: (string)   - This value will be displayed in the output so that identification by the user
 #                      is easier when many shell provisioners are present. (optional)
