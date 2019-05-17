@@ -615,7 +615,7 @@ synced_folders:
 #   file_provisioning:
 #    - source: "~/.gitconfig"
 #      destination: ".gitconfig"
-#    - source: "~/path/to/host/folder"
+#    - source: "/path/to/host/folder"
 #      destination: "$HOME/remote/newfolder"
 # Defaults to `nil`.
 file_provisioning:

@@ -618,7 +618,7 @@ end
 #   file_provisioning:
 #    - source: "~/.gitconfig"
 #      destination: ".gitconfig"
-#    - source: "~/path/to/host/folder"
+#    - source: "/path/to/host/folder"
 #      destination: "$HOME/remote/newfolder"
 def file_provisioners(vm, host, global)
   if fps = get_config_parameter(host, global, 'file_provisioning')
