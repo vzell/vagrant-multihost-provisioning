@@ -275,7 +275,7 @@ roles_path = ./ansible/roles
 [ssh_connection]
 # ssh arguments to use (`ControlMaster=no` is needed for Ansible to work on Cygwin).
 # Needs to be explicitly set by Vagrant with ansible.raw_ssh_args in Vagrantfile.
-# Vagrant uses ANSIBLE_SSH_ARGS for Cygwin which has higher precedence than Ansibel configuration options.
+# Vagrant uses ANSIBLE_SSH_ARGS for Cygwin which has higher precedence than Ansible configuration options.
 ssh_args = -o ControlMaster=no
 FILE
     # Otherwise,... generate the Ansible configuration file for `ansible` mode provisioner
