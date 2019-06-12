@@ -8,9 +8,17 @@ require 'yaml'
 $install_git = <<-SCRIPT
 if ! command -v git >/dev/null 2>&1; then
   if command -v yum >/dev/null 2>&1; then
+    # CentOS, RHEL, Oracle Linux
     yum -y install git
   elif command -v apt-get >/dev/null 2>&1; then
+    # Debian, Ubuntu
     apt-get -y install git
+  elif command -v dnf >/dev/null 2>&1; then
+    # Fedora
+    dnf -y install git
+  elif command -v pacman >/dev/null 2>&1; then
+    # Arch Linux
+    pacman -S git
   else
     echo "package manager not yet supported"
   fi
