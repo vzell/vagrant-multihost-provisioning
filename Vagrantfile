@@ -62,7 +62,7 @@ end
 VAGRANTFILE_API_VERSION = '2'
 
 # Initialize coloured script output
-ui = Vagrant::UI::Colored.new
+@ui = Vagrant::UI::Colored.new
 
 # Set Vagrant controlfile
 vagrantconf = ENV['VAGRANT_CONF'] ? ENV['VAGRANT_CONF'] : 'vagrant-conf.yml'
@@ -185,20 +185,20 @@ SSH_FORWARD_X11             = set_global_default(global, 'SSH_FORWARD_X11',     
 
 def install_plugins
   unless Vagrant.has_plugin?("vagrant-vbguest")
-    ui.info("Installing vagrant-vbguest Plugin...")
+    @ui.info("Installing vagrant-vbguest Plugin...")
     system('vagrant plugin install vagrant-vbguest')
   end
 
   if USE_PROXY
     unless Vagrant.has_plugin?("vagrant-proxyconf")
-      ui.info("Installing vagrant-proxyconf Plugin...")
+      @ui.info("Installing vagrant-proxyconf Plugin...")
       system('vagrant plugin install vagrant-proxyconf')
     end
   end
 
   if USE_HOSTMANAGER
     unless Vagrant.has_plugin?("vagrant-hostmanager")
-      ui.info("Installing vagrant-hostmanager Plugin...")
+      @ui.info("Installing vagrant-hostmanager Plugin...")
       system('vagrant plugin install vagrant-hostmanager')
     end
   end
@@ -208,21 +208,21 @@ end
 
 # {{{ Configure plugins
 
-def configure_proxy_plugin(ui)
+def configure_proxy_plugin
   # Add optional proxy configuration from host environment
   if USE_PROXY
     if Vagrant.has_plugin?("vagrant-proxyconf")
-      ui.warn("Getting Proxy Configuration from Host...")
+      @ui.warn("Getting Proxy Configuration from Host...")
       if ENV["http_proxy"]
-        ui.info("http_proxy: " + ENV["http_proxy"])
+        @ui.info("http_proxy: " + ENV["http_proxy"])
         config.proxy.http = ENV["http_proxy"]
       end
       if ENV["https_proxy"]
-        ui.info("https_proxy: " + ENV["https_proxy"])
+        @ui.info("https_proxy: " + ENV["https_proxy"])
         config.proxy.https = ENV["https_proxy"]
       end
       if ENV["no_proxy"]
-        ui.info("no_proxy: " + ENV["no_proxy"])
+        @ui.info("no_proxy: " + ENV["no_proxy"])
         config.proxy.no_proxy = ENV["no_proxy"]
       end
     end
@@ -841,8 +841,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Add optional proxy configuration from host environment
-  configure_proxy_plugin(ui)
-  
+  configure_proxy_plugin()
+
   # Configure hostmanager plugin
   if USE_HOSTMANAGER
     config.hostmanager.enabled      = true
@@ -943,7 +943,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         shell_provisioners_never(node.vm, host, global)
       end
 
-      ui.warn "#{node.vm.hostname}: #{node.vm.box} [Memory: #{vm_memory}, CPUs: #{vm_cpus}]"
+      @ui.warn "#{node.vm.hostname}: #{node.vm.box} [Memory: #{vm_memory}, CPUs: #{vm_cpus}]"
 
       # VirtualBox Provider
       node.vm.provider :virtualbox do |vb|
@@ -963,7 +963,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Only execute the Ansible provisioner once, when all the machines are up and ready
       if i == hosts.length && RUN_ANSIBLE_PROVISIONER
-        ui.warn "Ansible Local Mode: #{run_locally?}, Ansible Playbook: #{ANSIBLE_PLAYBOOK}"
+        @ui.warn "Ansible Local Mode: #{run_locally?}, Ansible Playbook: #{ANSIBLE_PLAYBOOK}"
         provision_ansible(node.vm, host, global)
       end
 
