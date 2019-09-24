@@ -841,7 +841,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Add optional proxy configuration from host environment
-  configure_proxy_plugin()
+  if USE_PROXY
+    configure_proxy_plugin()
+  else
+    config.proxy.enabled = false
+  end
 
   # Configure hostmanager plugin
   if USE_HOSTMANAGER
