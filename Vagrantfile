@@ -789,7 +789,7 @@ def merge_vm_parameters(host, global, vb)
   end
 end
 
-# Create new Standard disks and attach them to a SATA controller.
+# Create new "Standard" disks and attach them to a SATA controller.
 # Disk information is merged from the global and VM specific section.
 def merge_vm_disks(host, global, vb, sata_controller)
   vb_dir="./.virtualbox/"
