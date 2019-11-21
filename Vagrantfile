@@ -910,11 +910,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         if !([host_alias,host_aliases].reject(&:empty?).join(' ')).empty?
           node.hostmanager.aliases = [host_alias,host_aliases].reject(&:empty?).join(' ')
         end
-        # Vagrant adds the hostname to the loopback address 127.0.0.1, on Ubuntu also to 127.0.1.1
-        # https://github.com/hashicorp/vagrant/issues/7263
-        node.vm.provision :shell, run: "always", name: "Removing hostname from loopback address...",
-                          inline: "sed -i'' '/^127.0.[0-1].1.*#{host['hostname']}$/d' /etc/hosts"
       end
+      # Vagrant adds the hostname to the loopback address 127.0.0.1, on Ubuntu also to 127.0.1.1
+      # https://github.com/hashicorp/vagrant/issues/7263
+      node.vm.provision :shell, run: "always", name: "Removing hostname from loopback address...",
+                        inline: "sed -i'' '/^127.0.[0-1].1.*#{host['hostname']}$/d' /etc/hosts"
 
       # Synched folders setup
       synced_folders(node.vm, host, global)
