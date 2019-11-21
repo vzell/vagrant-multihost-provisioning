@@ -752,7 +752,7 @@ scripts_always:
 
 # Defaults to `nil`.
 scripts_never:
-  - name: "bootsrap-script"
+  - name: "bootstrap-script"
     script: ./scripts/bootstrap.sh
 ...
 ```
