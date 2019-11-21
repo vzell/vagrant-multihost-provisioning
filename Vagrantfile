@@ -805,6 +805,22 @@ def merge_vm_disks(host, global, vb, sata_controller)
   end
 end
 
+# Create new "Fixed Shared" disks and attach them to a SATA controller.
+# Disk information is merged from the global and VM specific section.
+def merge_vm_shared_disks(host, global, vb, sata_controller)
+  vb_dir="./.virtualbox/"
+  if global['vm_shared_disks'] or host['vm_shared_disks']
+    merge_hash = merge_2_array_of_hashes(global['vm_shared_disks'], host['vm_shared_disks'])
+    merge_hash.each do |key, value|
+      diskname="#{vb_dir}shared-#{key}.vdi"
+      unless File.exist?(diskname)
+        vb.customize ["createmedium", "disk", "--filename", diskname, "--size", value * 1024 , "--format", "vdi", "--variant", "Fixed"]
+      end
+      vb.customize ["storageattach", :id , "--storagectl", sata_controller, "--port", key, "--device", "0", "--type", "hdd", "--medium", diskname, "--mtype", "shareable"]
+    end
+  end
+end
+
 # }}}
 
 install_plugins()
@@ -963,6 +979,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         merge_vm_parameters(host, global, vb)
         # Add additional "Standard" disks to the VM (assumes a SATA controller), beside the system disk assumed to be on SATA port 0
         merge_vm_disks(host, global, vb, sata_controller)
+        # Add additional "Fixed Shared" disks to the VM (assumes a SATA controller), beside the system disk assumed to be on SATA port 0
+        merge_vm_shared_disks(host, global, vb, sata_controller)
       end # node.vm.provider
 
       # Only execute the Ansible provisioner once, when all the machines are up and ready

@@ -556,12 +556,25 @@ vm_options:
 # Defaults to `SATA Controller`.
 sata_controller: "SATAController"
 
-# List of disks which should be attached to a SATA controller.
+# List of "Standard" dynamically allocated disks which should be attached to a SATA controller.
+# These will initially be very small and not occupy any space for unused virtual disk sectors, but will grow every
+# time a disk sector is written to for the first time, until the drive reaches the maximum capacity chosen when the drive was created.
 # First parameter specifies the `SATA port` to attach the disk, second parameter specifies the `disksize` in GB.
 # Defaults to `nil`.
 vm_disks:
   - { 1: 2000 }
   - { 2: 2000 }
+
+# List of "Fixed Shared" disks which should be attached to a SATA controller.
+# Image files will be created on your host system which have roughly the same size as the virtual disk's capacity.
+# First parameter specifies the `SATA port` to attach the disk, second parameter specifies the `disksize` in GB.
+# Can be useful when creating Oracle RAC environments.
+# Defaults to `nil`.
+vm_shared_disks:
+  - { 3: 20 }
+  - { 4: 20 }
+  - { 5: 20 }
+  - { 6: 20 }
 
 # Synced folders enable Vagrant to sync a folder on the host machine to the guest machine.
 # By default, Vagrant mounts the synced folders with the owner/group set to the SSH user and any parent folders set to root.
@@ -767,7 +780,7 @@ list element, other settings (see below) are optional:
 
 # For EVERY host specification you can optionally have a hash of options which correspond
 # to the same named options from the global section. Options from the global section will be OVERWRITTEN
-# when specified here, EXCEPT for `vm_options` and `vm_disks` in which case the options are MERGED.
+# when specified here, EXCEPT for `vm_options`, `vm_shared_disks` and `vm_disks` in which case the options are MERGED.
 # Additionally there exist the following NEW options:
 
 # private_networks:
