@@ -484,9 +484,15 @@ box: vzell/packer-ol76
 # The URL that the configured box can be found at. If the above `box` is a shorthand to a box in HashiCorp's
 # Vagrant Cloud then this value does not need to be specified. Otherwise, it should point to the proper place
 # where the box can be found if it is not installed. This can also be an array of multiple URLs.
-# The URLs will be tried in order. The URLs can also be local files by using the `file://` scheme.
+# The URLs will be tried in order.
+# The URLs can also be local files by using the `file://` scheme.
+# In order to serve multiple versions of a vagrant box and enable update notifications a box catalog can be setup and referenced.
+# This catalog is written in JSON code to a single file. See also https://www.vagrantup.com/docs/boxes/format.html for the format.
+# On Windows systems the following syntax needs to be used for the `file://` scheme, either inside the JSON file for the `url` parameter
+# or when referenced with `box_url`:
+#   file:////D:/misc/vagrant/boxes/ol77.json
 # Defaults to use the Vagrant Cloud - https://app.vagrantup.com/boxes/search
-box_url: https://volkerzell.de/vagrant/packer-ol76-0.9.0.box
+box_url: https://volkerzell.de/vagrant/ol/7.6/ol76.json
 
 # The version of the box to use.  This can contain an arbitrary list of constraints, separated by commas,
 # such as: >= 1.0, < 1.5. When constraints are given, Vagrant will use the latest available box satisfying these constraints.
