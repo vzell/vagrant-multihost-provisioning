@@ -181,51 +181,22 @@ SSH_FORWARD_X11             = set_global_default(global, 'SSH_FORWARD_X11',     
 
 # }}}
 
-# {{{ Make sure important plugins are installed
-
-def install_plugins
-  unless Vagrant.has_plugin?("vagrant-vbguest")
-    @ui.info("Installing vagrant-vbguest Plugin...")
-    system('vagrant plugin install vagrant-vbguest')
-  end
-
-  if USE_PROXY
-    unless Vagrant.has_plugin?("vagrant-proxyconf")
-      @ui.info("Installing vagrant-proxyconf Plugin...")
-      system('vagrant plugin install vagrant-proxyconf')
-    end
-  end
-
-  if USE_HOSTMANAGER
-    unless Vagrant.has_plugin?("vagrant-hostmanager")
-      @ui.info("Installing vagrant-hostmanager Plugin...")
-      system('vagrant plugin install vagrant-hostmanager')
-    end
-  end
-end
-
-# }}}
-
 # {{{ Configure plugins
 
-def configure_proxy_plugin
+def configure_proxy_plugin(config)
   # Add optional proxy configuration from host environment
-  if USE_PROXY
-    if Vagrant.has_plugin?("vagrant-proxyconf")
-      @ui.warn("Getting Proxy Configuration from Host...")
-      if ENV["http_proxy"]
-        @ui.info("http_proxy: " + ENV["http_proxy"])
-        config.proxy.http = ENV["http_proxy"]
-      end
-      if ENV["https_proxy"]
-        @ui.info("https_proxy: " + ENV["https_proxy"])
-        config.proxy.https = ENV["https_proxy"]
-      end
-      if ENV["no_proxy"]
-        @ui.info("no_proxy: " + ENV["no_proxy"])
-        config.proxy.no_proxy = ENV["no_proxy"]
-      end
-    end
+  @ui.info("Getting Proxy Configuration from Host...")
+  if ENV["http_proxy"]
+    @ui.info("http_proxy: " + ENV["http_proxy"])
+    config.proxy.http = ENV["http_proxy"]
+  end
+  if ENV["https_proxy"]
+    @ui.info("https_proxy: " + ENV["https_proxy"])
+    config.proxy.https = ENV["https_proxy"]
+  end
+  if ENV["no_proxy"]
+    @ui.info("no_proxy: " + ENV["no_proxy"])
+    config.proxy.no_proxy = ENV["no_proxy"]
   end
 end
 
@@ -823,7 +794,6 @@ end
 
 # }}}
 
-install_plugins()
 if RUN_ANSIBLE_PROVISIONER
   generate_pip_install_requirements(pip_requirements)
   generate_ansible_galaxy_requirements(galaxy_requirements)
@@ -856,18 +826,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-  # Add optional proxy configuration from host environment
+  # Install and configure required plugins
+  plugins = ["vagrant-vbguest", "vagrant-proxyconf"]
   if USE_PROXY
-    configure_proxy_plugin()
+    configure_proxy_plugin(config)
   else
+    @ui.info("Disabling proxy plugin")
     config.proxy.enabled = false
   end
-
-  # Configure hostmanager plugin
   if USE_HOSTMANAGER
+    plugins.push("vagrant-hostmanager")
     config.hostmanager.enabled      = true
     config.hostmanager.manage_guest = true
   end
+  config.vagrant.plugins = plugins
 
   # Vagrant 1.7+ automatically inserts a different insecure keypair for each new
   # VM created. The easiest way to use the same keypair for all the machines is
