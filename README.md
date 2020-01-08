@@ -488,9 +488,13 @@ box: vzell/packer-ol76
 # The URLs can also be local files by using the `file://` scheme.
 # In order to serve multiple versions of a vagrant box and enable update notifications a box catalog can be setup and referenced.
 # This catalog is written in JSON code to a single file. See also https://www.vagrantup.com/docs/boxes/format.html for the format.
-# On Windows systems the following syntax needs to be used for the `file://` scheme, either inside the JSON file for the `url` parameter
-# or when referenced with `box_url`:
-#   file:////D:/misc/vagrant/boxes/ol77.json
+# On Windows systems the following syntax needs to be used for the `file://` scheme,
+# either inside the JSON file for the `url` parameter or when referenced with `box_url`:
+#   file:////D:/misc/vagrant/boxes/ol77.json - when referencing with absolute pathnames
+#   file://./boxes/ol77.json                 - when referencing with relative pathnames to the project directory
+# Instead of a JSON metafile a reference to the box file can be given directly:
+#   file:////D:/misc/vagrant/boxes/ol77.box  - when referencing with absolute pathnames
+#   file://./boxes/ol77.box                  - when referencing with relative pathnames to the project directory
 # Defaults to use the Vagrant Cloud - https://app.vagrantup.com/boxes/search
 box_url: https://volkerzell.de/vagrant/ol/7.6/ol76.json
 
