@@ -42,3 +42,17 @@ ansible/roles/*.*
 
 # log files from ubuntu provisioning
 *.log
+
+# generated artefacts
+ansible/ansible.cfg
+ansible/inventory.ini
+ansible/site.yml
+
+# demo vagrant-conf.yml files
+apache.yml
+atlassian.yml
+custom-vagrant-conf.yml
+
+# misc files
+README.org
+
