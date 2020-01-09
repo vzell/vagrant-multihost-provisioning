@@ -441,6 +441,9 @@ def provision_ansible(vm, host, global)
   end
 end
 
+# TODO: In the case of "auto_config=false" implement manual network configuration with inline shell always
+#       for private and public networks - https://www.vagrantup.com/docs/networking/public_network.html
+
 # Vagrant private networks allow you to access your guest machine by some address that is not publicly
 # accessible from the global internet. In general, this means your machine gets an address in the private address space.
 # Multiple machines within the same private network (also usually with the restriction that they're backed by the same provider)
