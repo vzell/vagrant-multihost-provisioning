@@ -515,6 +515,7 @@ def forwarded_ports(vm, host)
   if host.has_key?('forwarded_ports')
     ports = host['forwarded_ports']
     ports.each do |port|
+      # TODO: Implement "Forwarded Port Protocols" - https://www.vagrantup.com/docs/networking/forwarded_ports.html
       vm.network "forwarded_port", guest: port['guest'], host: port['host']
     end
   end
