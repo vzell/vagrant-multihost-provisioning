@@ -1,5 +1,8 @@
 # Generic Vagrantfile that can be used without modification in a variety of situations.
 # Configuration is read from `vagrant-conf.yml` by default.
+#
+# See also: Multihost Virtual Machine Provisioning powered by Vagrant
+#           https://github.com/vzell/vagrant-multihost-provisioning
 
 require 'rbconfig'
 require 'yaml'
