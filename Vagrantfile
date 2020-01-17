@@ -845,6 +845,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     plugins.push("vagrant-hostmanager")
     config.hostmanager.enabled      = true
     config.hostmanager.manage_guest = true
+    # TODO: make this configurable
+    config.hostmanager.manage_host  = false
   end
   config.vagrant.plugins = plugins
 
