@@ -843,9 +843,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Install and configure required plugins
   plugins = ["vagrant-vbguest", "vagrant-proxyconf"]
   if USE_PROXY
+    @ui.info("Enabling proxy plugin")
     configure_proxy_plugin(config)
   else
-    @ui.info("Disabling proxy plugin")
     config.proxy.enabled = false
   end
   if USE_HOSTMANAGER
