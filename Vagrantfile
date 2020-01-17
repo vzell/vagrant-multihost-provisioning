@@ -8,7 +8,8 @@
 #  - Add host['vm_name'] and fallback host['hostname'] to host['vm_name'] if not set
 #  - Change VirtualBox disk controller functionality to also work with IDE instead of just SATA
 #  - add VirtualBox automount functionality to synced folder setup
-#  - add support for vagrant-disksize plugin
+#  - add support for vagrant-disksize plugin - https://github.com/sprotheroe/vagrant-disksize
+#  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
 
 require 'rbconfig'
 require 'yaml'
