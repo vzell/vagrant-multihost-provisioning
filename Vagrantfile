@@ -4,6 +4,11 @@
 # See also: Multihost Virtual Machine Provisioning powered by Vagrant
 #           https://github.com/vzell/vagrant-multihost-provisioning
 
+# Generic TODO list:
+#  - Add host['vm_name'] and fallback host['hostname'] to host['vm_name'] if not set
+#  - Change VirtualBox disk controller functionality to also work with IDE instead of just SATA
+#  - add VirtualBox automount functionality to synced folder setup
+
 require 'rbconfig'
 require 'yaml'
 
