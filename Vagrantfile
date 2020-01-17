@@ -820,27 +820,30 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # TODO: Implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
   # if Vagrant.version?(">= 2.2.4")
-  #   config.trigger.before :status, type: :command do |t|
-  #     t.info = "... BEFORE status COMMAND trigger... "
+  #   # Command triggers
+  #   config.trigger.before :status, type: :command do |trigger|
+  #     trigger.info = "... Before :status **command** trigger ..."
+  #   end
+  #   config.trigger.after :halt, type: :command do |trigger|
+  #     trigger.warn = "... After :halt **command** trigger ..."
+  #   end
+
+  #   # Hook triggers
+  #   config.trigger.before :provisioner_run, type: :hook do |t|
+  #     t.info = "... Before :provisioner_run **hook** trigger ..."
+  #   end
+
+  #   # Action triggers
+  #   config.trigger.before :"Vagrant::Action::Builtin::GracefulHalt", type: :action do |t|
+  #     t.warn = "... Before 'Vagrant::Action::Builtin::GracefulHalt' **action** trigger ..."
   #   end
   # end
 
-  # Encapsulate in IF logic (only when global trigger variable is set)
+  # # Guest "only_on" triggers
   # config.trigger.before :up do |trigger|
-  #   trigger.name = "Needs to be evaluated"
-  #   trigger.info = "I am running BEFORE vagrant up!!"
-  # end
-
-  # config.trigger.after :up do |trigger|
-  #   trigger.name = "Needs to be evaluated"
-  #   trigger.info = "I am running AFTER vagrant up!!"
-  # end
-
-  # config.trigger.before :all do |trigger|
-  #   trigger.name = "Needs to be evaluated"
-  #   trigger.info = "I am running BEFORE EVERY vagrant command!!"
+  #   trigger.only_on = "ol76"
+  #   trigger.info    = "... Before UP **guest 'only-on' action** trigger ..."
   # end
 
   # Install and configure required plugins
