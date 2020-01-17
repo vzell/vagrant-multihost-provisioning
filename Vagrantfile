@@ -8,6 +8,7 @@
 #  - Add host['vm_name'] and fallback host['hostname'] to host['vm_name'] if not set
 #  - Change VirtualBox disk controller functionality to also work with IDE instead of just SATA
 #  - add VirtualBox automount functionality to synced folder setup
+#  - add support for vagrant-disksize plugin
 
 require 'rbconfig'
 require 'yaml'
@@ -817,6 +818,7 @@ end
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # TODO: Implement trigger functionality
+  # encapsulate in IF logic (only when global trigger variable is set)
   # config.trigger.before :up do |trigger|
   #   trigger.name = "Needs to be evaluated"
   #   trigger.info = "I am running BEFORE vagrant up!!"
