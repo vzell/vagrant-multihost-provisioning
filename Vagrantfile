@@ -144,6 +144,8 @@ end
 
 # {{{ Initialize global environment from Vagrant configuration or use sensible defaults
 
+# When set to true, Vagrant will show project specific verbose output
+VAGRANT_UI_VERBOSE          = set_global_default(global, 'VAGRANT_UI_VERBOSE',          false)
 # By default, Vagrant expects a "vagrant" user to SSH into the machine as. This
 # user should be setup with the insecure keypair that Vagrant uses as a default
 # to attempt to SSH.
@@ -952,7 +954,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         shell_provisioners_never(node.vm, host, global)
       end
 
-      @ui.warn "#{node.vm.hostname}: #{node.vm.box} [Memory: #{vm_memory}, CPUs: #{vm_cpus}]"
+      @ui.warn "#{node.vm.hostname}: #{node.vm.box} [Memory: #{vm_memory}, CPUs: #{vm_cpus}]" if VAGRANT_UI_VERBOSE
 
       # VirtualBox Provider
       node.vm.provider :virtualbox do |vb|
@@ -974,7 +976,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Only execute the Ansible provisioner once, when all the machines are up and ready
       if i == hosts.length && RUN_ANSIBLE_PROVISIONER
-        @ui.warn "Ansible Local Mode: #{run_locally?}, Ansible Playbook: #{ANSIBLE_PLAYBOOK}"
+        @ui.warn "Ansible Local Mode: #{run_locally?}, Ansible Playbook: #{ANSIBLE_PLAYBOOK}" if VAGRANT_UI_VERBOSE
         provision_ansible(node.vm, host, global)
       end
 

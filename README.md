@@ -308,6 +308,10 @@ that are controlled by Vagrant.
 # Empty YAML mapping/hash: comment THIS one when you uncomment at least ONE other global option 
 #{}
 
+# If true, Vagrant will show project specific verbose output
+# Defaults to `false`.
+VAGRANT_UI_VERBOSE: true
+
 # Vagrant user.
 # Defaults to `vagrant`.
 VAGRANT_USER: vagrant
