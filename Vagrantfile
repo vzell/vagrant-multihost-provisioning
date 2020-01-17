@@ -818,8 +818,14 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  # TODO: Implement trigger functionality
-  # encapsulate in IF logic (only when global trigger variable is set)
+  # TODO: Implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
+  # if Vagrant.version?(">= 2.2.4")
+  #   config.trigger.before :status, type: :command do |t|
+  #     t.info = "... BEFORE status COMMAND trigger... "
+  #   end
+  # end
+
+  # Encapsulate in IF logic (only when global trigger variable is set)
   # config.trigger.before :up do |trigger|
   #   trigger.name = "Needs to be evaluated"
   #   trigger.info = "I am running BEFORE vagrant up!!"
@@ -834,12 +840,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #   trigger.name = "Needs to be evaluated"
   #   trigger.info = "I am running BEFORE EVERY vagrant command!!"
   # end
-
-  if Vagrant.version?(">= 2.3.0")
-    config.trigger.before :status, type: :command do |t|
-      t.info = "Before STATUS command!!!!!!!"
-    end
-  end
 
   # Install and configure required plugins
   plugins = ["vagrant-vbguest", "vagrant-proxyconf"]
