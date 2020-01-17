@@ -40,9 +40,9 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
   alias_method :original_call, :call
   def call(env)
     machine = env[:machine]
-    driver = machine.provider.driver
-    uuid = driver.instance_eval { @uuid }
-    ui = env[:ui]
+    driver  = machine.provider.driver
+    uuid    = driver.instance_eval { @uuid }
+    ui      = env[:ui]
 
     # puts "MACHINE"
     # puts env[:machine].inspect
@@ -53,7 +53,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
 
     controller_name = File.read(".sata_controller.#{machine.name}")
 
-    vm_info = driver.execute("showvminfo", uuid)
+    vm_info             = driver.execute("showvminfo", uuid)
     has_this_controller = vm_info.match("Storage Controller Name.*#{controller_name}")
 
     if has_this_controller
@@ -61,8 +61,8 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
     else
       ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
       driver.execute('storagectl', uuid,
-                     '--name', "#{controller_name}",
-                     '--add', 'sata',
+                     '--name'      , "#{controller_name}",
+                     '--add'       , 'sata',
                      '--controller', 'IntelAhci')
     end
     original_call(env)
