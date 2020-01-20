@@ -64,8 +64,8 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
     else
       ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
       driver.execute('storagectl', uuid,
-                     '--name'      , "#{controller_name}",
-                     '--add'       , 'sata',
+                     '--name',       "#{controller_name}",
+                     '--add',        'sata',
                      '--controller', 'IntelAhci')
     end
     original_call(env)
