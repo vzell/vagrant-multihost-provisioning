@@ -10,6 +10,8 @@
 #  - add VirtualBox automount functionality to synced folder setup
 #  - add support for vagrant-disksize plugin - https://github.com/sprotheroe/vagrant-disksize
 #  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
+#  - make VirtualBox base directory for virtual disks configurable
+#  - enable movement of OS disk
 
 require 'rbconfig'
 require 'yaml'
