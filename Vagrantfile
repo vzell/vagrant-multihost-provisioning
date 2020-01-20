@@ -12,6 +12,7 @@
 #  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
 #  - make VirtualBox base directory for virtual disks configurable
 #  - enable movement of OS disk
+#  - make disk controller functionality configurable
 
 require 'rbconfig'
 require 'yaml'
