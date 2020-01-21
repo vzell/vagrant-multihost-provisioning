@@ -907,19 +907,22 @@ list element, other settings (see below) are optional:
 #   controlhost: true
 
 
-# Hostname specifications:
-- vm_name: node1
+# Virtual machine specifications:
+- vm_name:  node1
+  hostname: master
   private_networks:
-    - ip: 192.168.56.121
+    - ip:   192.168.56.121
 
-- vm_name: node2
+- vm_name:  node2
+  hostname: slave
   private_networks:
-    - ip: 192.168.56.122
+    - ip:   192.168.56.122
 
-- vm_name: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
-  controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
+- vm_name:     ansiblehost     # The Ansible control VM MUST be the last list entry in multihost environments
+  controlhost: true            # AND controlhost MUST be set to `true` for ansible_local provisioning mode
   private_networks:
-    - ip: 192.168.56.110
+    - ip:      192.168.56.110
+  vm_memory:   4096            # overwrites global `vm_memory` parameter if set
 ...
 ```
 
