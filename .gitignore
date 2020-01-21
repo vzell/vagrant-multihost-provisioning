@@ -54,5 +54,6 @@ atlassian.yml
 custom-vagrant-conf.yml
 
 # misc files
+TODO.org
 README.org
 Vagrantfile.TODO

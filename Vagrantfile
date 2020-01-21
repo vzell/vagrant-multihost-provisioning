@@ -4,11 +4,6 @@
 # See also: Multihost Virtual Machine Provisioning powered by Vagrant
 #           https://github.com/vzell/vagrant-multihost-provisioning
 
-# Generic TODO list:
-#  - add VirtualBox automount functionality to synced folder setup
-#  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
-#  - enable movement of OS disk
-
 require 'rbconfig'
 require 'yaml'
 
