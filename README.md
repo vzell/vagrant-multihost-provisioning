@@ -489,6 +489,11 @@ HOSTMANAGER_IGNORE_PRIV_IP: true
 # Defaults to `false`.
 USE_DISKSIZE: true
 
+# os_disk:
+# When using the Vagrant disksize-plugin the disksize in GB to which the first disk (OS) should be increased.
+# Defaults to `40`.
+os_size: 60
+
 ####################
 # VM default options
 ####################
@@ -820,11 +825,6 @@ list element, other settings (see below) are optional:
 # Defaults to the value of `vm_name` if NOT set.
 # Example:
 #   hostname:  master-one.192.168.33.7.xip.io
-
-# os_disk:
-# When using the Vagrant disksize-plugin the disksize in GB to which the first disk (OS) should be increased.
-# Example:
-#   os_size: 60
 
 # private_networks:
 # Vagrant `private networks` allow you to access your guest machine by some address that is not publicly

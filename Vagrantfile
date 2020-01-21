@@ -905,7 +905,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vm_groups              = set_host_default(global, host, 'vm_groups',              '/' + File.basename(Dir.getwd))
       vm_memory              = set_host_default(global, host, 'vm_memory',              1024)
       vm_cpus                = set_host_default(global, host, 'vm_cpus',                1)
-      os_disk                = host.key?('os_disk') ? host['os_disk'] : 40              # default 40GB
+      os_disk                = set_host_default(global, host, 'os_disk',                40)
       hostname               = host['hostname'] ? host['hostname'] : host['vm_name']
       hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
                                  (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
