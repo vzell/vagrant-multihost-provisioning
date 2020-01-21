@@ -7,7 +7,6 @@
 # Generic TODO list:
 #  - Change VirtualBox disk controller functionality to also work with IDE instead of just SATA
 #  - add VirtualBox automount functionality to synced folder setup
-#  - add support for vagrant-disksize plugin - https://github.com/sprotheroe/vagrant-disksize
 #  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
 #  - enable movement of OS disk
 
@@ -169,6 +168,9 @@ USE_HOSTMANAGER             = set_global_default(global, 'USE_HOSTMANAGER',     
 HOSTMANAGER_MANAGE_HOST     = set_global_default(global, 'HOSTMANAGER_MANAGE_HOST',     false)
 # A machine's IP address is defined by either the static IP for a private network configuration or by the SSH host configuration.
 HOSTMANAGER_IGNORE_PRIV_IP  = set_global_default(global, 'HOSTMANAGER_IGNORE_PRIV_IP',  false)
+
+# Vagrant Disksize Plugin Configuration - https://github.com/sprotheroe/vagrant-disksize
+USE_DISKSIZE                = set_global_default(global, 'USE_DISKSIZE',                false)
 
 # The name of the Ansible Galaxy role file
 ANSIBLE_GALAXY_ROLE_FILE    = set_global_default(global, 'ANSIBLE_GALAXY_ROLE_FILE',    '.requirements.yml')
@@ -872,6 +874,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.hostmanager.manage_host       = HOSTMANAGER_MANAGE_HOST
     config.hostmanager.ignore_private_ip = HOSTMANAGER_IGNORE_PRIV_IP
   end
+  if USE_DISKSIZE
+    plugins.push("vagrant-disksize")
+  end
   config.vagrant.plugins = plugins
 
   # Vagrant 1.7+ automatically inserts a different insecure keypair for each new
@@ -900,6 +905,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vm_groups              = set_host_default(global, host, 'vm_groups',              '/' + File.basename(Dir.getwd))
       vm_memory              = set_host_default(global, host, 'vm_memory',              1024)
       vm_cpus                = set_host_default(global, host, 'vm_cpus',                1)
+      os_disk                = host.key?('os_disk') ? host['os_disk'] : 40              # default 40GB
       hostname               = host['hostname'] ? host['hostname'] : host['vm_name']
       hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
                                  (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
@@ -910,6 +916,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       
       if Vagrant.has_plugin?("vagrant-vbguest")
         node.vbguest.auto_update = vb_guest_auto_update
+      end
+
+      if USE_DISKSIZE
+        # Resize first disk in VirtualBox
+        node.disksize.size = "#{os_disk}GB"
       end
 
       # Vagrant box information

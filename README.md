@@ -485,6 +485,10 @@ HOSTMANAGER_MANAGE_HOST: true
 # Defaults to `false`.
 HOSTMANAGER_IGNORE_PRIV_IP: true
 
+# Vagrant Disksize Plugin Configuration - https://github.com/sprotheroe/vagrant-disksize
+# Defaults to `false`.
+USE_DISKSIZE: true
+
 ####################
 # VM default options
 ####################
@@ -816,6 +820,11 @@ list element, other settings (see below) are optional:
 # Defaults to the value of `vm_name` if NOT set.
 # Example:
 #   hostname:  master-one.192.168.33.7.xip.io
+
+# os_disk:
+# When using the Vagrant disksize-plugin the disksize in GB to which the first disk (OS) should be increased.
+# Example:
+#   os_size: 60
 
 # private_networks:
 # Vagrant `private networks` allow you to access your guest machine by some address that is not publicly
