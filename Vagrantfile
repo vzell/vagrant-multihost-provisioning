@@ -789,7 +789,8 @@ end
 # Create new "Standard" disks and attach them to a SATA controller.
 # Disk information is merged from the global and VM specific section.
 def merge_vm_disks(host, global, vb, sata_controller)
-  vb_dir="./.virtualbox/"
+  # Only get the first entry from global['vm_groups'] if more than one entry present
+  vb_dir=global['vm_basedir'] ? global['vm_basedir'] + global['vm_groups'].partition(',')[0] + "/" : "./.virtualbox/"
   if global['vm_disks'] or host['vm_disks']
     merge_hash = merge_2_array_of_hashes(global['vm_disks'], host['vm_disks'])
     merge_hash.each do |key, value|
@@ -805,7 +806,7 @@ end
 # Create new "Fixed Shared" disks and attach them to a SATA controller.
 # Disk information is merged from the global and VM specific section.
 def merge_vm_shared_disks(host, global, vb, sata_controller)
-  vb_dir="./.virtualbox/"
+  vb_dir=global['vm_basedir'] ? global['vm_basedir'] + global['vm_groups'].partition(',')[0] + "/" : "./.virtualbox/"
   if global['vm_shared_disks'] or host['vm_shared_disks']
     merge_hash = merge_2_array_of_hashes(global['vm_shared_disks'], host['vm_shared_disks'])
     merge_hash.each do |key, value|

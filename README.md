@@ -533,6 +533,10 @@ box_vagrantfile_ignore: true
 # Defaults to `<Name of your project directory>`.
 vm_groups: "/Test Group,/Test Group1/Test Group2"
 
+# Sets the base directory for virtual disks. Use forward slashes '/'.
+# Defaults to `./.virtualbox/`.
+vm_basedir: "C:/vm/virtualbox"
+
 # VirtualBox machines are started in headless mode, meaning there is no UI for the machines visible on the host machine.
 # Common use cases for wanting a UI include wanting to see a browser that may be running in the machine, or debugging a strange boot issue.
 # Defaults to `false`.
