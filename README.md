@@ -476,6 +476,15 @@ USE_PROXY: true
 # Defaults to `true`.
 USE_HOSTMANAGER: true
 
+# To update the host's hosts file
+# Defaults to `false`.
+HOSTMANAGER_MANAGE_HOST: true
+
+# A machine's IP address is defined by either the static IP for a private network configuration
+# or by the SSH host configuration.
+# Defaults to `false`.
+HOSTMANAGER_IGNORE_PRIV_IP: true
+
 ####################
 # VM default options
 ####################

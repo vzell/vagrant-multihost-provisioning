@@ -162,10 +162,17 @@ ENV["LC_ALL"]               = set_global_default(global, 'LC_ALL',              
 # When set to `true`, Ansible will be forced to be run locally on the VM
 # instead of from the host machine (provided Ansible is installed).
 FORCE_LOCAL_RUN             = set_global_default(global, 'FORCE_LOCAL_RUN',             false)
-# Vagrant Proxy Plugin Configuration
+
+# Vagrant Proxy Plugin Configuration - http://tmatilai.github.io/vagrant-proxyconf/
 USE_PROXY                   = set_global_default(global, 'USE_PROXY',                   false)
-# Vagrant Hostmanager Plugin Configuration
+
+## Vagrant Hostmanager Plugin Configuration - https://github.com/devopsgroup-io/vagrant-hostmanager
 USE_HOSTMANAGER             = set_global_default(global, 'USE_HOSTMANAGER',             true)
+# To update the host's hosts file
+HOSTMANAGER_MANAGE_HOST     = set_global_default(global, 'HOSTMANAGER_MANAGE_HOST',     false)
+# A machine's IP address is defined by either the static IP for a private network configuration or by the SSH host configuration.
+HOSTMANAGER_IGNORE_PRIV_IP  = set_global_default(global, 'HOSTMANAGER_IGNORE_PRIV_IP',  false)
+
 # The name of the Ansible Galaxy role file
 ANSIBLE_GALAXY_ROLE_FILE    = set_global_default(global, 'ANSIBLE_GALAXY_ROLE_FILE',    '.requirements.yml')
 # Should `ansible-galaxy` overwrite roles after initial download
@@ -859,10 +866,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
   if USE_HOSTMANAGER
     plugins.push("vagrant-hostmanager")
-    config.hostmanager.enabled      = true
-    config.hostmanager.manage_guest = true
-    # TODO: make this configurable
-    config.hostmanager.manage_host  = false
+    config.hostmanager.enabled           = true
+    config.hostmanager.manage_guest      = true
+    config.hostmanager.manage_host       = HOSTMANAGER_MANAGE_HOST
+    config.hostmanager.ignore_private_ip = HOSTMANAGER_IGNORE_PRIV_IP
   end
   config.vagrant.plugins = plugins
 
