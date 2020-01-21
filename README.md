@@ -158,16 +158,16 @@ vm_options:
 ...
 
 --- # (2) List of virtual machines to be created by Vagrant
-- hostname: node1
+- vm_name: node1
   private_networks:
     - ip: 192.168.56.121
 
-- hostname: node2
+- vm_name: node2
   private_networks:
     - ip: 192.168.56.122
 
-- hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
-  controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
+- vm_name: ansiblehost      # The Ansible control VM MUST be the last list entry in multihost environments
+  controlhost: true         # AND `controlhost` MUST be set to `true` for `ansible_local` provisioning mode
   box: centos/7
   private_networks:
     - ip: 192.168.56.110
@@ -232,7 +232,7 @@ domain: oc.de
 ...
 
 --- # (2) List of virtual machines to be created by Vagrant
-- hostname: elk
+- vm_name: elk
   private_networks:
     - ip: 192.168.56.223
 ...
@@ -786,8 +786,8 @@ scripts_never:
 
 ## (2) List of virtual machines to be created by Vagrant
 
-The `second YAML document section` specifies the nodes that are controlled by
-Vagrant as a YAML list. You should at least specify a `hostname` attribute for each
+The `second YAML document section` specifies list of VirtualBox VMs that are controlled
+by Vagrant as a YAML list. You should at least specify a `vm_name` attribute for each
 list element, other settings (see below) are optional:
 
 ```Yaml
@@ -796,19 +796,26 @@ list element, other settings (see below) are optional:
 #[]
 
 # This configuration section configures a list of VirtualBox VMs which should be created by Vagrant.
-# Every host specification starts with the `hostname` the machine should have. The hostname will be set on boot.
+# Every VM specification starts with the virtual machine name `vm_name`. This name is also shown in
+# the Oracle VM VirtualBox Manager GUI for the VM name.
 # In case of `multihost environments` and Ansible provisioning in `ansible_local` mode
-# the Ansible controlhost MUST be the LAST list entry.
+# the Ansible control VM MUST be the LAST list entry.
 # Defaults to `ansiblehost`.
 # Example:
-#   - hostname: node1
-#   - hostname: node2
-#   - hostname: ansiblehost      # Ansible controlhost MUST be the last list entry in multihost environments
+#   - vm_name: node1
+#   - vm_name: node2
+#   - vm_name: ansiblehost   # The Ansible control VM MUST be the last list entry in multihost environments
 
-# For EVERY host specification you can optionally have a hash of options which correspond
+# For EVERY VM specification you can optionally have a hash of options which correspond
 # to the same named options from the global section. Options from the global section will be OVERWRITTEN
-# when specified here, EXCEPT for `vm_options`, `vm_shared_disks` and `vm_disks` in which case the options are MERGED.
+# when specified here, EXCEPT for `vm_options` and `vm_disks` in which case the options are MERGED.
 # Additionally there exist the following NEW options:
+
+# hostname:
+# This is the actual hostname for the underlying VM. The hostname will be set on boot.
+# Defaults to the value of `vm_name` if NOT set.
+# Example:
+#   hostname:  master-one.192.168.33.7.xip.io
 
 # private_networks:
 # Vagrant `private networks` allow you to access your guest machine by some address that is not publicly
@@ -901,15 +908,15 @@ list element, other settings (see below) are optional:
 
 
 # Hostname specifications:
-- hostname: node1
+- vm_name: node1
   private_networks:
     - ip: 192.168.56.121
 
-- hostname: node2
+- vm_name: node2
   private_networks:
     - ip: 192.168.56.122
 
-- hostname: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
+- vm_name: ansiblehost     # Ansible controlhost MUST be the last list entry in multihost environments
   controlhost: true         # AND controlhost MUST be set to `true` for ansible_local provisioning mode
   private_networks:
     - ip: 192.168.56.110

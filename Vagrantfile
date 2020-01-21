@@ -96,7 +96,7 @@ ansible_cfgs     = nil if ansible_cfgs == {}
 
 # If no hostname is specified in the configuration file use the name `ansiblehost`
 if hosts.empty?
-  hosts = [{"hostname"=>"ansiblehost"}]
+  hosts = [{"vm_name"=>"ansiblehost"}]
 end
 
 # {{{ Helper functions
@@ -317,7 +317,8 @@ def generate_ansible_playbooks(hosts, galaxy_requirements, playbooks)
     File.open(ANSIBLE_FOLDER + ANSIBLE_PLAYBOOK, "ab") { |file|
       file << "---\n"
       hosts.each do |host|
-        file << "- hosts: #{host['hostname']}\n"
+        hostname = host['hostname'] ? host['hostname'] : host['vm_name']
+        file << "- hosts: #{hostname}\n"
         file << "  become: true\n"
         file << "  roles:\n"
         galaxy_requirements.each do |role|
@@ -349,18 +350,19 @@ def generate_ansible_local_inventory(global, hosts, inventory_groupings)
   File.open(ANSIBLE_FOLDER + ANSIBLE_LOCAL_INVENTORY, 'wb') { |file|
     hosts.each do |host|
       i = i + 1
+      hostname = host['hostname'] ? host['hostname'] : host['vm_name']
       python_interpreter = get_config_parameter(host, global, 'python_interpreter')
       if i == hosts.length
         if python_interpreter
-          file.write("#{host['hostname']} ansible_connection=local ansible_python_interpreter=#{python_interpreter}\n")
+          file.write("#{hostname} ansible_connection=local ansible_python_interpreter=#{python_interpreter}\n")
         else
-          file.write("#{host['hostname']} ansible_connection=local\n")
+          file.write("#{hostname} ansible_connection=local\n")
         end
       else
         if python_interpreter
-          file.write("#{host['hostname']} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key ansible_python_interpreter=#{python_interpreter}\n")
+          file.write("#{hostname} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key ansible_python_interpreter=#{python_interpreter}\n")
         else
-          file.write("#{host['hostname']} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key\n")
+          file.write("#{hostname} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file=/vagrant/.vagrant/insecure_private_key\n")
         end
       end
     end
@@ -375,6 +377,7 @@ def generate_ansible_inventory(global, hosts, inventory_groupings)
   File.open(ANSIBLE_FOLDER + ANSIBLE_INVENTORY, 'wb') { |file|
     hosts.each do |host|
       i = i + 1
+      hostname = host['hostname'] ? host['hostname'] : host['vm_name']
       python_interpreter = get_config_parameter(host, global, 'python_interpreter')
       if host.has_key?('forwarded_ssh_port')
         ansible_ssh_port = host['forwarded_ssh_port']['host']
@@ -386,9 +389,9 @@ def generate_ansible_inventory(global, hosts, inventory_groupings)
         end
       end
       if python_interpreter
-        file.write("#{host['hostname']} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key' ansible_python_interpreter=#{python_interpreter}\n")
+        file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key' ansible_python_interpreter=#{python_interpreter}\n")
       else
-        file.write("#{host['hostname']} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key'\n")
+        file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key'\n")
       end
     end
   }
@@ -794,7 +797,7 @@ def merge_vm_disks(host, global, vb, sata_controller)
   if global['vm_disks'] or host['vm_disks']
     merge_hash = merge_2_array_of_hashes(global['vm_disks'], host['vm_disks'])
     merge_hash.each do |key, value|
-      diskname="#{vb_dir}#{host['hostname']}-#{key}.vdi"
+      diskname="#{vb_dir}#{host['vm_name']}-#{key}.vdi"
       unless File.exist?(diskname)
         vb.customize ["createmedium", "disk", "--filename", diskname, "--size", value * 1024 , "--format", "vdi", "--variant", "Standard"]
       end
@@ -882,7 +885,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   i = 0
   hosts.each do |host|
-    config.vm.define host['hostname'] do |node|
+    config.vm.define host['vm_name'] do |node|
       i = i + 1
 
       # Initialize host specific environment from Vagrant configuration or use sensible defaults
@@ -896,16 +899,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       sata_controller        = set_host_default(global, host, 'sata_controller',        'SATA Controller')
       vm_gui                 = set_host_default(global, host, 'vm_gui',                 false)
       vm_auto_nat_dns_proxy  = set_host_default(global, host, 'vm_auto_nat_dns_proxy',  true)
-      vm_name                = set_host_default(global, host, 'vm_name',                host['hostname'])
+      vm_name                = set_host_default(global, host, 'vm_name',                host['vm_name'])
       vm_groups              = set_host_default(global, host, 'vm_groups',              '/' + File.basename(Dir.getwd))
       vm_memory              = set_host_default(global, host, 'vm_memory',              1024)
       vm_cpus                = set_host_default(global, host, 'vm_cpus',                1)
-      hostname               = host.key?('domain') ? host['hostname'] + '.' + host['domain'] :
-                                 (global.key?('domain') ? host['hostname'] + '.' + global['domain'] : host['hostname'])
+      hostname               = host['hostname'] ? host['hostname'] : host['vm_name']
+      hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
+                                 (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
 
       # Generate the files with the SATA Controller name for each box
       # An inline plugin makes sure a SATA controller with a given name is present in the VM
-      File.open(".sata_controller.#{host['hostname']}", "wb") { |file| file.write(sata_controller) }
+      File.open(".sata_controller.#{host['vm_name']}", "wb") { |file| file.write(sata_controller) }
       
       if Vagrant.has_plugin?("vagrant-vbguest")
         node.vbguest.auto_update = vb_guest_auto_update
@@ -927,15 +931,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       if USE_HOSTMANAGER
         host_aliases = host.key?('aliases') ? host['aliases'].join(' ') : ''
-        host_alias   = (host.key?('domain') || global.key?('domain')) ? host['hostname'] : ''
+        host_alias   = (host.key?('domain') || global.key?('domain')) ? hostname : ''
         if !([host_alias,host_aliases].reject(&:empty?).join(' ')).empty?
           node.hostmanager.aliases = [host_alias,host_aliases].reject(&:empty?).join(' ')
         end
       end
       # Vagrant adds the hostname to the loopback address 127.0.0.1, on Ubuntu also to 127.0.1.1
       # https://github.com/hashicorp/vagrant/issues/7263
-      node.vm.provision :shell, run: "always", name: "Removing hostname from loopback address...",
-                        inline: "sed -i'' '/^127\.0\.[0-1]\.1.*#{host['hostname']}/d' /etc/hosts"
+      node.vm.provision :shell, run: "always", name: "Removing hostname #{hostname} from loopback address...",
+                        inline: "sed -i'' '/^127\.0\.[0-1]\.1.*#{hostname}/d' /etc/hosts"
 
       # Synched folders setup
       synced_folders(node.vm, host, global)
