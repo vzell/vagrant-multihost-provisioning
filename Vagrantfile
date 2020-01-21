@@ -5,7 +5,6 @@
 #           https://github.com/vzell/vagrant-multihost-provisioning
 
 # Generic TODO list:
-#  - Change VirtualBox disk controller functionality to also work with IDE instead of just SATA
 #  - add VirtualBox automount functionality to synced folder setup
 #  - implement trigger functionality - https://www.vagrantup.com/docs/triggers/configuration.html
 #  - enable movement of OS disk
@@ -34,7 +33,8 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 SCRIPT
 
-# Inline plugin which makes sure a SATA controller with a given name is present in the VM
+# Inline plugin which makes sure a disk controller with the given name is present in the VM
+# in case we want to add additional virtual disks to the VMs.
 class VagrantPlugins::ProviderVirtualBox::Action::SetName
   alias_method :original_call, :call
   def call(env)
@@ -50,7 +50,7 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
     # puts "GLOBAL"
     # puts env[:global_config].inspect
 
-    controller_name = File.read(".sata_controller.#{machine.name}")
+    controller_name = File.read(".controller.#{machine.name}")
 
     vm_info             = driver.execute("showvminfo", uuid)
     has_this_controller = vm_info.match("Storage Controller Name.*#{controller_name}")
@@ -58,11 +58,25 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
     if has_this_controller
       ui.info "Machine #{machine.name} already has the '#{controller_name}' HDD controller"
     else
-      ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
-      driver.execute('storagectl', uuid,
-                     '--name',       "#{controller_name}",
-                     '--add',        'sata',
-                     '--controller', 'IntelAhci')
+      if controller_name.start_with?("IDE")
+        ui.warn "Creating IDE controller with name '#{controller_name}' on machine #{machine.name}..."
+        driver.execute('storagectl', uuid,
+                       '--name',       "#{controller_name}",
+                       '--add',        'ide',
+                       '--controller', 'PIIX4')
+      elsif controller_name.start_with?("SCSI")
+        ui.warn "Creating SCSI controller with name '#{controller_name}' on machine #{machine.name}..."
+        driver.execute('storagectl', uuid,
+                       '--name',       "#{controller_name}",
+                       '--add',        'scsi',
+                       '--controller', 'LSILogic')
+      else
+        ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
+        driver.execute('storagectl', uuid,
+                       '--name',       "#{controller_name}",
+                       '--add',        'sata',
+                       '--controller', 'IntelAhci')
+      end
     end
     original_call(env)
   end
@@ -788,9 +802,9 @@ def merge_vm_parameters(host, global, vb)
   end
 end
 
-# Create new "Standard" disks and attach them to a SATA controller.
+# Create new "Standard" disks and attach them to a disk controller.
 # Disk information is merged from the global and VM specific section.
-def merge_vm_disks(host, global, vb, sata_controller)
+def merge_vm_disks(host, global, vb, controller)
   # Only get the first entry from global['vm_groups'] if more than one entry present
   vb_dir=global['vm_basedir'] ? global['vm_basedir'] + global['vm_groups'].partition(',')[0] + "/" : "./.virtualbox/"
   if global['vm_disks'] or host['vm_disks']
@@ -800,14 +814,14 @@ def merge_vm_disks(host, global, vb, sata_controller)
       unless File.exist?(diskname)
         vb.customize ["createmedium", "disk", "--filename", diskname, "--size", value * 1024 , "--format", "vdi", "--variant", "Standard"]
       end
-      vb.customize ["storageattach", :id , "--storagectl", sata_controller, "--port", key, "--device", "0", "--type", "hdd", "--medium", diskname]
+      vb.customize ["storageattach", :id , "--storagectl", controller, "--port", key, "--device", "0", "--type", "hdd", "--medium", diskname]
     end
   end
 end
 
-# Create new "Fixed Shared" disks and attach them to a SATA controller.
+# Create new "Fixed Shared" disks and attach them to a disk controller.
 # Disk information is merged from the global and VM specific section.
-def merge_vm_shared_disks(host, global, vb, sata_controller)
+def merge_vm_shared_disks(host, global, vb, controller)
   vb_dir=global['vm_basedir'] ? global['vm_basedir'] + global['vm_groups'].partition(',')[0] + "/" : "./.virtualbox/"
   if global['vm_shared_disks'] or host['vm_shared_disks']
     merge_hash = merge_2_array_of_hashes(global['vm_shared_disks'], host['vm_shared_disks'])
@@ -816,7 +830,7 @@ def merge_vm_shared_disks(host, global, vb, sata_controller)
       unless File.exist?(diskname)
         vb.customize ["createmedium", "disk", "--filename", diskname, "--size", value * 1024 , "--format", "vdi", "--variant", "Fixed"]
       end
-      vb.customize ["storageattach", :id , "--storagectl", sata_controller, "--port", key, "--device", "0", "--type", "hdd", "--medium", diskname, "--mtype", "shareable"]
+      vb.customize ["storageattach", :id , "--storagectl", controller, "--port", key, "--device", "0", "--type", "hdd", "--medium", diskname, "--mtype", "shareable"]
     end
   end
 end
@@ -898,7 +912,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       box_check_update       = set_host_default(global, host, 'box_check_update',       true)
       box_vagrantfile_ignore = set_host_default(global, host, 'box_vagrantfile_ignore', true)
       vb_guest_auto_update   = set_host_default(global, host, 'vb_guest_auto_update',   true)
-      sata_controller        = set_host_default(global, host, 'sata_controller',        'SATA Controller')
+      controller             = set_host_default(global, host, 'controller',             'SATA Controller')
       vm_gui                 = set_host_default(global, host, 'vm_gui',                 false)
       vm_auto_nat_dns_proxy  = set_host_default(global, host, 'vm_auto_nat_dns_proxy',  true)
       vm_name                = set_host_default(global, host, 'vm_name',                host['vm_name'])
@@ -910,9 +924,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
                                  (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
 
-      # Generate the files with the SATA Controller name for each box
-      # An inline plugin makes sure a SATA controller with a given name is present in the VM
-      File.open(".sata_controller.#{host['vm_name']}", "wb") { |file| file.write(sata_controller) }
+      # Generate the files with the disk controller name for each box
+      # An inline plugin makes sure a disk controller with a given name is present in the VM
+      File.open(".controller.#{host['vm_name']}", "wb") { |file| file.write(controller) }
       
       if Vagrant.has_plugin?("vagrant-vbguest")
         node.vbguest.auto_update = vb_guest_auto_update
@@ -994,10 +1008,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize ["modifyvm", :id, "--cpus",   vm_cpus]
         # Advanced Virtualbox VM options
         merge_vm_parameters(host, global, vb)
-        # Add additional "Standard" disks to the VM (assumes a SATA controller), beside the system disk assumed to be on SATA port 0
-        merge_vm_disks(host, global, vb, sata_controller)
-        # Add additional "Fixed Shared" disks to the VM (assumes a SATA controller), beside the system disk assumed to be on SATA port 0
-        merge_vm_shared_disks(host, global, vb, sata_controller)
+        # Add additional "Standard" disks to the VM, beside the system disk assumed to be on port 0
+        merge_vm_disks(host, global, vb, controller)
+        # Add additional "Fixed Shared" disks to the VM, beside the system disk assumed to be on port 0
+        merge_vm_shared_disks(host, global, vb, controller)
       end # node.vm.provider
 
       # Only execute the Ansible provisioner once, when all the machines are up and ready

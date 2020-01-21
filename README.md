@@ -587,10 +587,12 @@ vm_options:
   - { rtcuseutc: "on" }
   - { ioapic:    "on" }
 
-# Specifies the name of the SATA Controller which should be created if it doesn't exist in the box.
-# Most of the boxes use the name `SATA Controller`, but some boxes out there instead have a controller named `SATAController`.
+# Specifies the name of the disk Controller (which will be created if it doesn't exist in the VM), in case we want
+# to add additional virtual disks to the VMs. The controller name MUST start with either `SATA`, `SCSI` or `IDE`.
+# In case of SATA most of the boxes use the name `SATA Controller`, but some boxes out there instead have a controller
+# named `SATAController`.
 # Defaults to `SATA Controller`.
-sata_controller: "SATAController"
+controller: "SATAController"
 
 # List of "Standard" dynamically allocated disks which should be attached to a SATA controller.
 # These will initially be very small and not occupy any space for unused virtual disk sectors, but will grow every
