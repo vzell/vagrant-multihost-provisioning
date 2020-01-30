@@ -206,8 +206,12 @@ ANSIBLE_LOCAL_INVENTORY     = set_global_default(global, 'ANSIBLE_LOCAL_INVENTOR
 ANSIBLE_INVENTORY           = set_global_default(global, 'ANSIBLE_INVENTORY',           '.vagrant-inventory.ini')
 ANSIBLE_RAW_ARGS            = set_global_default(global, 'ANSIBLE_RAW_ARGS',            nil)
 ANSIBLE_VAULT_PASSWORD_FILE = set_global_default(global, 'ANSIBLE_VAULT_PASSWORD_FILE', nil)
+
 # If true, X11 forwarding over SSH connections is enabled.
 SSH_FORWARD_X11             = set_global_default(global, 'SSH_FORWARD_X11',             true)
+
+# Packer
+USE_PACKER                  = set_global_default(global, 'USE_PACKER',                  false)
 
 # }}}
 
@@ -841,6 +845,16 @@ if RUN_ANSIBLE_PROVISIONER
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  if USE_PACKER
+    config.trigger.before :up do |trigger|
+      # Only for the first list in node list
+      trigger.only_on = "#{hosts[0]['vm_name']}"
+      trigger.name    = "Run packer"
+      trigger.info    = "Running packer to generate Vagrant box with provisioning..."
+      trigger.run     = {inline: "bash -c ./packer/packer.sh"}
+    end
+  end
 
   # if Vagrant.version?(">= 2.2.4")
   #   # Command triggers

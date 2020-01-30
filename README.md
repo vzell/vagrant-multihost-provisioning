@@ -494,6 +494,16 @@ USE_DISKSIZE: true
 # Defaults to `40`.
 os_size: 60
 
+################################################
+# HashiCorp Packer Vagrant Builder functionality
+################################################
+
+# You can use HashiCorp Packer from https://www.packer.io/ (needs to be
+# downloaded and in the PATH) to build new boxes from already-existing boxes and
+# use the generated box at file://./boxes/package.box as the base image for your nodes.
+# Defaults to `false`.
+USE_PACKER: true
+
 ####################
 # VM default options
 ####################
