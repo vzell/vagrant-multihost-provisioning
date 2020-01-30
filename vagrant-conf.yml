@@ -196,8 +196,8 @@
 # VirtualBox NAT service functionality
 ######################################
 
-# When enabled a Vagrant generated VirtualBox HostAdapter network based topology will be switched to a
-# NON Vagrant VirtualBox NAT service adapter based network topology. This could be useful for example when
+# When enabled a Vagrant generated VirtualBox Host Only network based topology will be switched to a
+# NON Vagrant VirtualBox NAT service based network topology. This could be useful for example when
 # creating an OpenShift (OKD) based environment where just a single network adapter per host is supported.
 # Defaults to `false`.
 #USE_NATSERVICE: true
