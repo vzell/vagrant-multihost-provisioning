@@ -37,13 +37,13 @@ ansible/roles/*.*
 # requirements file for ansible-galaxy (will be generated)
 .requirements.txt
 
-#
-.sata*
+# generated controller filenames
+.controller*
 
 # log files from ubuntu provisioning
 *.log
 
-# generated artefacts
+# generated Ansible artefacts
 ansible/ansible.cfg
 ansible/inventory.ini
 ansible/site.yml
@@ -57,3 +57,15 @@ custom-vagrant-conf.yml
 TODO.org
 README.org
 Vagrantfile.TODO
+
+# generated NAT service scripts
+.addNATservice.sh
+.restartVMs.sh
+configureNATservice.sh
+destroyVMs.sh
+startVMs.sh
+stopVMs.sh
+
+# generated Packer files
+boxes/.vagrant
+boxes/Vagrantfile
