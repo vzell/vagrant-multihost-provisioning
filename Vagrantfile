@@ -210,6 +210,10 @@ ANSIBLE_VAULT_PASSWORD_FILE = set_global_default(global, 'ANSIBLE_VAULT_PASSWORD
 # If true, X11 forwarding over SSH connections is enabled.
 SSH_FORWARD_X11             = set_global_default(global, 'SSH_FORWARD_X11',             true)
 
+# NAT service
+USE_NATSERVICE              = set_global_default(global, 'USE_NATSERVICE',              false)
+natnetwork_name             = set_global_default(global, 'natnetwork_name',             'my-natnetwork')
+
 # Packer
 USE_PACKER                  = set_global_default(global, 'USE_PACKER',                  false)
 
@@ -836,6 +840,124 @@ end
 
 # }}}
 
+# {{{ Generate lifecycle scripts for NAT service
+
+def generate_natservice_stop(global, hosts)
+  # Generate stop script
+  File.open('stopVMs.sh', 'wb') { |file|
+    file.write("#!/bin/bash\n")
+    file.write("nodelist='\n")
+    hosts.each do |host|
+      file.write(" #{host['vm_name']}\n")
+    end
+    file.write("'\n")
+    file.write("for i in ${nodelist}\n")
+    file.write("do\n")
+    file.write("    echo \"Stopping ${i}...\"\n")
+    file.write("    vbm controlvm $(cat .vagrant/machines/${i}/virtualbox/id) acpipowerbutton\n")
+    file.write("done\n")
+  }
+end
+
+def generate_natservice_start(global, hosts)
+  # Generate start script
+  File.open('startVMs.sh', 'wb') { |file|
+    file.write("#!/bin/bash\n")
+    file.write("nodelist='\n")
+    hosts.each do |host|
+      file.write(" #{host['vm_name']}\n")
+    end
+    file.write("'\n")
+    file.write("for i in ${nodelist}\n")
+    file.write("do\n")
+    file.write("    echo \"Starting ${i}...\"\n")
+    file.write("    vbm startvm $(cat .vagrant/machines/${i}/virtualbox/id) --type gui\n")
+    file.write("done\n")
+  }
+end
+
+def generate_natservice_destroy(global, hosts)
+  # Generate destroy script
+  File.open('destroyVMs.sh', 'wb') { |file|
+    file.write("#!/bin/bash\n")
+    file.write("nodelist='\n")
+    hosts.each do |host|
+      file.write(" #{host['vm_name']}\n")
+    end
+    file.write("'\n")
+    file.write("./stopVMs.sh\n")
+    file.write("echo 'Sleeping 40s to avoid locking issues with the VMs...'\n")
+    file.write("sleep 40s\n")
+    file.write("for i in ${nodelist}\n")
+    file.write("do\n")
+    file.write("    echo \"Destroying ${i}...\"\n")
+    file.write("    vbm unregistervm --delete $(cat .vagrant/machines/${i}/virtualbox/id)\n")
+    file.write("done\n")
+  }
+end
+
+def generate_natservice_configure(global, hosts, natnetwork_name)
+  # Generate configure script
+  File.open('configureNATservice.sh', 'wb') { |file|
+    file << "#!/bin/bash\n"
+    file << "export natnetwork='#{natnetwork_name}'\n"
+    file << "nodelist='\n"
+    hosts.each do |host|
+      file << " #{host['vm_name']}\n"
+    end
+    file << "'\n"
+    file << "for i in ${nodelist}\n"
+    file << "do\n"
+    file << "    echo \"Removing NIC2 (HostOnly Adapter) from ${i}...\"\n"
+    file << "    vbm modifyvm $(cat .vagrant/machines/${i}/virtualbox/id) --nic2 none\n"
+    file << "    echo \"Changing NIC1 to NAT service network for ${i}...\"\n"
+    file << "    vbm modifyvm $(cat .vagrant/machines/${i}/virtualbox/id) --nic1 natnetwork --nat-network1 ${natnetwork} --cableconnected1 on\n"
+    file << "done\n"
+  }
+end
+
+def generate_natservice_restart()
+  # Generate hidden restart script
+  File.open('.restartVMs.sh', 'wb') { |file|
+    file.write("#!/bin/bash\n")
+    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
+    file.write("sleep 30s\n")
+    file.write("./stopVMs.sh\n")
+    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
+    file.write("sleep 30s\n")
+    file.write("./configureNATservice.sh\n")
+    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
+    file.write("sleep 30s\n")
+    file.write("./startVMs.sh\n")
+  }
+end
+
+def generate_natservice_add(global, hosts, natnetwork_name)
+  # Generate hidden script for adding new NAT service network
+  # Extract first 3 octets for IP from first node in node list and concatenate ".0/24"
+  natnetwork_cidr = hosts[0]['private_networks'][0]['ip'].rpartition(".")[0] + ".0/24"
+  # Extract IP from bastion node (last node in node list)
+  port_forward_4  = "ssh:tcp:[]:10033:[" + hosts[hosts.length-1]['private_networks'][0]['ip'] + "]:22"
+  File.open('.addNATservice.sh', 'wb') { |file|
+    file.write("#!/bin/bash\n")
+    file.write("export natnetwork='#{natnetwork_name}'\n")
+    file.write("vbm natnetwork remove --netname ${natnetwork}\n")
+    file.write("vbm natnetwork add    --netname ${natnetwork} --network '#{natnetwork_cidr}' --dhcp off --enable\n")
+    file.write("vbm natnetwork modify --netname ${natnetwork} --port-forward-4 '#{port_forward_4}'\n")
+  }
+end
+
+# }}}
+
+if USE_NATSERVICE
+  generate_natservice_stop(global, hosts)
+  generate_natservice_start(global, hosts)
+  generate_natservice_destroy(global, hosts)
+  generate_natservice_configure(global, hosts, natnetwork_name)
+  generate_natservice_restart()
+  generate_natservice_add(global, hosts, natnetwork_name)
+end
+
 if RUN_ANSIBLE_PROVISIONER
   generate_pip_install_requirements(pip_requirements)
   generate_ansible_galaxy_requirements(galaxy_requirements)
@@ -853,6 +975,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.name    = "Run packer"
       trigger.info    = "Running packer to generate Vagrant box with provisioning..."
       trigger.run     = {inline: "bash -c ./packer/packer.sh"}
+    end
+  end
+
+  if USE_NATSERVICE
+    config.trigger.before :up do |trigger|
+      # Only for the first list in node list
+      trigger.only_on = "#{hosts[0]['vm_name']}"
+      trigger.name    = "Add new NAT service network"
+      trigger.info    = "Adding new NAT service network #{natnetwork_name}..."
+      trigger.run     = {inline: "bash -c ./.addNATservice.sh"}
+    end
+    config.trigger.after :up do |trigger|
+      # Only for the last list in node list
+      trigger.only_on = "#{hosts[hosts.length-1]['vm_name']}"
+      trigger.name    = "Restart VMs"
+      trigger.info    = "Restarting VMs with NAT service network..."
+      trigger.run     = {inline: "bash -c ./.restartVMs.sh"}
     end
   end
 
@@ -976,8 +1115,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       synced_folders(node.vm, host, global)
       if run_locally? and (controlhost or i == hosts.length)
         # Mandatory in "ansible_local" mode for multihost environments with Ansible controlhost
-        node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", mount_options: ['dmode=0775', 'fmode=0664']
-        node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", mount_options: ['dmode=0700', 'fmode=0600']
+        if USE_NATSERVICE
+          node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", automount: true, mount_options: ['dmode=0775', 'fmode=0664']
+          node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", automount: true, mount_options: ['dmode=0700', 'fmode=0600']
+        else
+          node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", mount_options: ['dmode=0775', 'fmode=0664']
+          node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", mount_options: ['dmode=0700', 'fmode=0600']
+        end
       end
 
       # SSH setup for multimaster environments, copy the insecure private SSH key...

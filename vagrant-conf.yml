@@ -192,6 +192,20 @@
 # Defaults to `40`.
 #os_size: 60
 
+######################################
+# VirtualBox NAT service functionality
+######################################
+
+# When enabled a Vagrant generated VirtualBox HostAdapter network based topology will be switched to a
+# NON Vagrant VirtualBox NAT service adapter based network topology. This could be useful for example when
+# creating an OpenShift (OKD) based environment where just a single network adapter per host is supported.
+# Defaults to `false`.
+#USE_NATSERVICE: true
+
+# The name of the NAT service adapter in VirtualBox which will be created when enabling USE_NATSERVICE.
+# Defaults to `my-natnetwork`.
+#natnetwork_name:  "k8s-network"
+
 ################################################
 # HashiCorp Packer Vagrant Builder functionality
 ################################################
