@@ -217,6 +217,10 @@ natnetwork_name             = set_global_default(global, 'natnetwork_name',     
 # Packer
 USE_PACKER                  = set_global_default(global, 'USE_PACKER',                  false)
 
+# AFTER UP trigger
+AFTER_UP_TRIGGER            = set_global_default(global, 'AFTER_UP_TRIGGER',            false)
+after_up_script             = set_global_default(global, 'after_up_script',             './setupOKD.sh')
+
 # }}}
 
 # {{{ Configure plugins
@@ -986,6 +990,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.name    = "Restart VMs"
       trigger.info    = "Restarting VMs with NAT service network..."
       trigger.run     = {inline: "bash -c ./.restartVMs.sh"}
+    end
+  end
+
+  if AFTER_UP_TRIGGER
+    config.trigger.after :up do |trigger|
+      trigger.only_on = "#{hosts[hosts.length-1]['vm_name']}"
+      trigger.name    = "AFTER UP of final Guest trigger"
+      trigger.info    = "Running AFTER UP of final Guest trigger..."
+      trigger.run     = {inline: "bash -c #{after_up_script}"}
     end
   end
 

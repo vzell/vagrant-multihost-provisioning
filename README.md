@@ -518,6 +518,18 @@ natnetwork_name:  "k8s-network"
 # Defaults to `false`.
 USE_PACKER: true
 
+###############################
+# Vagrant trigger functionality
+###############################
+
+# AFTER UP Guest 'only-on first node in nodelist' action trigger
+# Defaults to `false`.
+AFTER_UP_TRIGGER: true
+
+# Script to execute by Vagrant AFTER UP trigger
+# Defaults to `./setupOKD.sh`.
+after_up_script: "./scripts/myAfterUpTrigger.sh"
+
 ####################
 # VM default options
 ####################
