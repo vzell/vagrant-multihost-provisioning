@@ -223,6 +223,16 @@ after_up_script             = set_global_default(global, 'after_up_script',     
 
 # }}}
 
+# {{{ Configure dependent variables
+
+# auto mount functionality for VirtualBox synced folders
+auto_mount                  = set_global_default(global, 'auto_mount',                  false)
+if USE_NATSERVICE
+  auto_mount=true
+end
+
+# }}}
+
 # {{{ Configure plugins
 
 def configure_proxy_plugin(config)
@@ -1122,13 +1132,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       synced_folders(node.vm, host, global)
       if run_locally? and (controlhost or i == hosts.length)
         # Mandatory in "ansible_local" mode for multihost environments with Ansible controlhost
-        if USE_NATSERVICE
-          node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", automount: true, mount_options: ['dmode=0775', 'fmode=0664']
-          node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", automount: true, mount_options: ['dmode=0700', 'fmode=0600']
-        else
-          node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", mount_options: ['dmode=0775', 'fmode=0664']
-          node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", mount_options: ['dmode=0700', 'fmode=0600']
-        end
+        node.vm.synced_folder "."         , "/vagrant"         , type: "virtualbox", automount: auto_mount, mount_options: ['dmode=0775', 'fmode=0664']
+        node.vm.synced_folder "./.vagrant", "/vagrant/.vagrant", type: "virtualbox", automount: auto_mount, mount_options: ['dmode=0700', 'fmode=0600']
       end
 
       # SSH setup for multimaster environments, copy the insecure private SSH key...
