@@ -216,8 +216,8 @@ provisioning on a *single* node.
 
 ```Yaml
 --- # (1) Global parameters for all VMs to be created by Vagrant
-box:       			vzell/packer-ol76
-box_url:   			https://volkerzell.de/vagrant/packer-ol76-0.9.0.box
+box:                vzell/packer-ol76
+box_url:            https://volkerzell.de/vagrant/packer-ol76-0.9.0.box
 box_check_update:   false
 vm_memory:          8192
 vm_cpus:            2
