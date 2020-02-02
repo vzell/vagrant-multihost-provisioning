@@ -842,93 +842,86 @@ end
 
 # {{{ Generate lifecycle scripts for NAT service
 
+def generate_natservice_nodeinfo(global, hosts)
+  # Generate nodeinfo
+  File.open('.nodeinfo', 'wb') { |file|
+    hosts.each do |host|
+      file << "#{host['vm_name']} #{host['role'] ? host['role'] : 'none'} #{host['hostname']} #{host['private_networks'][0]['ip']}\n"
+    end
+  }
+end
+
 def generate_natservice_stop(global, hosts)
   # Generate stop script
   File.open('stopVMs.sh', 'wb') { |file|
-    file.write("#!/bin/bash\n")
-    file.write("nodelist='\n")
-    hosts.each do |host|
-      file.write(" #{host['vm_name']}\n")
-    end
-    file.write("'\n")
-    file.write("for i in ${nodelist}\n")
-    file.write("do\n")
-    file.write("    echo \"Stopping ${i}...\"\n")
-    file.write("    vbm controlvm $(cat .vagrant/machines/${i}/virtualbox/id) acpipowerbutton\n")
-    file.write("done\n")
+    file << "#!/bin/bash\n"
+    file << "nodeinfo=.nodeinfo\n"
+    file << "while read -r vm_name role hostname ip\n"
+    file << "do\n"
+    file << "    echo \"Stopping ${vm_name}...\"\n"
+    file << "    vbm controlvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) acpipowerbutton\n"
+    file << "done < ${nodeinfo}\n"
   }
 end
 
 def generate_natservice_start(global, hosts)
   # Generate start script
   File.open('startVMs.sh', 'wb') { |file|
-    file.write("#!/bin/bash\n")
-    file.write("nodelist='\n")
-    hosts.each do |host|
-      file.write(" #{host['vm_name']}\n")
-    end
-    file.write("'\n")
-    file.write("for i in ${nodelist}\n")
-    file.write("do\n")
-    file.write("    echo \"Starting ${i}...\"\n")
-    file.write("    vbm startvm $(cat .vagrant/machines/${i}/virtualbox/id) --type gui\n")
-    file.write("done\n")
+    file << "#!/bin/bash\n"
+    file << "nodeinfo=.nodeinfo\n"
+    file << "while read -r vm_name role hostname ip\n"
+    file << "do\n"
+    file << "    echo \"Starting ${vm_name}...\"\n"
+    file << "    vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --type gui\n"
+    file << "done < ${nodeinfo}\n"
   }
 end
 
 def generate_natservice_destroy(global, hosts)
   # Generate destroy script
   File.open('destroyVMs.sh', 'wb') { |file|
-    file.write("#!/bin/bash\n")
-    file.write("nodelist='\n")
-    hosts.each do |host|
-      file.write(" #{host['vm_name']}\n")
-    end
-    file.write("'\n")
-    file.write("./stopVMs.sh\n")
-    file.write("echo 'Sleeping 40s to avoid locking issues with the VMs...'\n")
-    file.write("sleep 40s\n")
-    file.write("for i in ${nodelist}\n")
-    file.write("do\n")
-    file.write("    echo \"Destroying ${i}...\"\n")
-    file.write("    vbm unregistervm --delete $(cat .vagrant/machines/${i}/virtualbox/id)\n")
-    file.write("done\n")
+    file << "#!/bin/bash\n"
+    file << "./stopVMs.sh\n"
+    file << "echo 'Sleeping 40s to avoid locking issues with the VMs...'\n"
+    file << "sleep 40s\n"
+    file << "nodeinfo=.nodeinfo\n"
+    file << "while read -r vm_name role hostname ip\n"
+    file << "do\n"
+    file << "    echo \"Destroying ${vm_name}...\"\n"
+    file << "    vbm unregistervm --delete $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
+    file << "done < ${nodeinfo}\n"
   }
 end
 
 def generate_natservice_configure(global, hosts, natnetwork_name)
   # Generate configure script
-  File.open('configureNATservice.sh', 'wb') { |file|
+  File.open('.configureNATservice.sh', 'wb') { |file|
     file << "#!/bin/bash\n"
     file << "export natnetwork='#{natnetwork_name}'\n"
-    file << "nodelist='\n"
-    hosts.each do |host|
-      file << " #{host['vm_name']}\n"
-    end
-    file << "'\n"
-    file << "for i in ${nodelist}\n"
+    file << "nodeinfo=.nodeinfo\n"
+    file << "while read -r vm_name role hostname ip\n"
     file << "do\n"
-    file << "    echo \"Removing NIC2 (HostOnly Adapter) from ${i}...\"\n"
-    file << "    vbm modifyvm $(cat .vagrant/machines/${i}/virtualbox/id) --nic2 none\n"
-    file << "    echo \"Changing NIC1 to NAT service network for ${i}...\"\n"
-    file << "    vbm modifyvm $(cat .vagrant/machines/${i}/virtualbox/id) --nic1 natnetwork --nat-network1 ${natnetwork} --cableconnected1 on\n"
-    file << "done\n"
+    file << "    echo \"Removing NIC2 Host Only Adapter from ${vm_name}...\"\n"
+    file << "    vbm modifyvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --nic2 none\n"
+    file << "    echo \"Changing NIC1 from NAT to NAT service adapter for ${vm_name}...\"\n"
+    file << "    vbm modifyvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --nic1 natnetwork --nat-network1 ${natnetwork} --cableconnected1 on\n"
+    file << "done < ${nodeinfo}\n"
   }
 end
 
 def generate_natservice_restart()
   # Generate hidden restart script
   File.open('.restartVMs.sh', 'wb') { |file|
-    file.write("#!/bin/bash\n")
-    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
-    file.write("sleep 30s\n")
-    file.write("./stopVMs.sh\n")
-    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
-    file.write("sleep 30s\n")
-    file.write("./configureNATservice.sh\n")
-    file.write("echo 'Sleeping 30s to avoid locking issues with the VMs...'\n")
-    file.write("sleep 30s\n")
-    file.write("./startVMs.sh\n")
+    file << "#!/bin/bash\n"
+    file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
+    file << "sleep 30s\n"
+    file << "./stopVMs.sh\n"
+    file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
+    file << "sleep 30s\n"
+    file << "./.configureNATservice.sh\n"
+    file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
+    file << "sleep 30s\n"
+    file << "./startVMs.sh\n"
   }
 end
 
@@ -950,6 +943,7 @@ end
 # }}}
 
 if USE_NATSERVICE
+  generate_natservice_nodeinfo(global, hosts)
   generate_natservice_stop(global, hosts)
   generate_natservice_start(global, hosts)
   generate_natservice_destroy(global, hosts)
