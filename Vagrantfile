@@ -1140,6 +1140,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         shell_provisioners_always(node.vm, host, global)
         shell_provisioners_never(node.vm, host, global)
       end
+      if USE_NATSERVICE
+        node.vm.provision :shell, name: "Switch network to NAT service mode...",
+                          path: "./scripts/fix-network.sh"
+      end
 
       @ui.warn "#{node.vm.hostname}: #{node.vm.box} [Memory: #{vm_memory}, CPUs: #{vm_cpus}]" if VAGRANT_UI_VERBOSE
 
