@@ -1092,6 +1092,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
                                  (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
 
+      if USE_PACKER
+        box_url = "file://./boxes/package.box"
+      end
+
       # Generate the files with the disk controller name for each box
       # An inline plugin makes sure a disk controller with a given name is present in the VM
       File.open(".controller.#{host['vm_name']}", "wb") { |file| file.write(controller) }
