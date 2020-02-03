@@ -937,6 +937,8 @@ def generate_natservice_restart()
     file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
     file << "sleep 30s\n"
     file << "./startVMs.sh\n"
+    file << "echo 'Sleeping 30s waiting for the VMs to come up...'\n"
+    file << "sleep 30s\n"
   }
 end
 
