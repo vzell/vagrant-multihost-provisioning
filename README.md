@@ -534,6 +534,11 @@ after_up_script: "./scripts/myAfterUpTrigger.sh"
 # VM default options
 ####################
 
+# This configures what box Packer will use to provision and create a new box. The value here should be the
+# shorthand name of a box in HashiCorp's Vagrant Cloud.
+# Defaults to `centos/7`.
+packer_box: generic/ubuntu1810
+
 # This configures what box the machine will be brought up against. The value here should be the name of
 # an installed box or a shorthand name of a box in HashiCorp's Vagrant Cloud.
 # Defaults to `centos/7`.

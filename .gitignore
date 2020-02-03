@@ -69,3 +69,4 @@ stopVMs.sh
 # generated Packer files
 boxes/.vagrant
 boxes/Vagrantfile
+packer/template.json
