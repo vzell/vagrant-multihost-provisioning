@@ -904,6 +904,7 @@ def generate_natservice_destroy(global, hosts)
     file << "    echo \"Destroying ${vm_name}...\"\n"
     file << "    vbm unregistervm --delete $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
     file << "done < ${nodeinfo}\n"
+    file << "rm -rf .vagrant/machines\n"
   }
 end
 
