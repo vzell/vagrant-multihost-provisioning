@@ -886,7 +886,7 @@ def generate_natservice_start(global, hosts)
     file << "while read -r vm_name role hostname ip\n"
     file << "do\n"
     file << "    echo \"Starting ${vm_name}...\"\n"
-    file << "    vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --type gui\n"
+    file << "    vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
     file << "done < ${nodeinfo}\n"
   }
 end
