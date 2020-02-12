@@ -56,12 +56,12 @@ custom-vagrant-conf.yml
 # misc files
 TODO.org
 README.org
-Vagrantfile.TODO
 
 # generated NAT service scripts
+.nodeinfo
 .addNATservice.sh
 .restartVMs.sh
-configureNATservice.sh
+.configureNATservice.sh
 destroyVMs.sh
 startVMs.sh
 stopVMs.sh
