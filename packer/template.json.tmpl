@@ -1,0 +1,24 @@
+{
+  "variables": {
+    "output_path":            "./boxes"
+  },
+  "builders": [
+    {
+      "type":                 "vagrant",
+      "source_path":          "_BOX_",
+      "add_force":            true,
+      "communicator":         "ssh",
+      "ssh_username":         "vagrant",
+      "ssh_private_key_file": "./.vagrant/insecure_private_key",
+      "provider":             "virtualbox",
+      "output_dir":           "{{user `output_path`}}",
+      "teardown_method":      "destroy"
+    }
+  ],
+  "provisioners": [
+    {
+      "type":                 "shell",
+      "script":               "./scripts/config.sh"
+    }
+  ]
+}
