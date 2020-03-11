@@ -5,6 +5,9 @@ template=./packer/template.json
 
 echo "Using Vagrant configuration file: ${vagrant_conf}"
 
+echo "Fixing permissions on ./.vagrant/insecure_private_key"
+chmod 600 ./.vagrant/insecure_private_key
+
 # Get box name for packer to base build on
 if grep "^packer_box:" ${vagrant_conf} > /dev/null 2>&1
 then
