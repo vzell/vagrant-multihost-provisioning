@@ -959,6 +959,19 @@ def generate_natservice_add(global, hosts, natnetwork_name)
   }
 end
 
+def generate_natservice_restartnat(natnetwork_name)
+  # Generate restart NAT Service script
+  File.open('restartNATservice.sh', 'wb') { |file|
+    file << "#!/bin/bash\n"
+    file << "export natnetwork='#{natnetwork_name}'\n"
+    file << "echo \"Restarting VirtualBox NATServiceNetwork ${natnetwork}...\"\n"
+    file << "vbm natnetwork stop  --netname ${natnetwork}\n"
+    file << "sleep 10\n"
+    file << "vbm natnetwork start  --netname ${natnetwork}\n"
+    file << "echo \"Done...\"\n"
+  }
+end
+
 # }}}
 
 if USE_NATSERVICE
@@ -969,6 +982,7 @@ if USE_NATSERVICE
   generate_natservice_configure(global, hosts, natnetwork_name)
   generate_natservice_restart()
   generate_natservice_add(global, hosts, natnetwork_name)
+  generate_natservice_restartnat(natnetwork_name)
 end
 
 if RUN_ANSIBLE_PROVISIONER
