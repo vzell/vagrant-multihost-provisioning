@@ -21,7 +21,7 @@ sed -e "s#_BOX_#${box}#g" ${template}.tmpl > ${template}
 # Validate before building
 packer validate ${template}
 
-# Shoew components of build
+# Show components of build
 packer inspect ${template}
 
 # Actual building of box
