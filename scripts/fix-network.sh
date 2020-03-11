@@ -15,7 +15,8 @@ ipaddr=$(hostname -i | cut -d' ' -f1)
 gateway=$(echo ${ipaddr} | cut -d'.' -f-3).1
 dns1=${gateway}
 # Configure first interface (currently the VirtualBox NAT Adapter)
-# as the original second one (after reboot this will be the VirtualBox NAT service adapter)
+# as the original second one (after reboot this will be the VirtualBox NAT Service Adapter)
+echo "Configuring first interface (VirtualBox NAT Service Adapter)..."
 cat > /etc/sysconfig/network-scripts/ifcfg-${device} <<-_EOF
 NM_CONTROLLED=yes
 BOOTPROTO=none
