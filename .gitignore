@@ -38,7 +38,7 @@ ansible/roles/*.*
 .requirements.txt
 
 # generated controller filenames
-.controller*
+.*controller*
 
 # log files from ubuntu provisioning
 *.log
@@ -65,6 +65,7 @@ README.org
 destroyVMs.sh
 startVMs.sh
 stopVMs.sh
+restartNATservice.sh
 
 # generated Packer files
 boxes/.vagrant
