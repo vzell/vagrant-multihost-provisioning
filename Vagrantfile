@@ -905,6 +905,8 @@ def generate_natservice_destroy(global, hosts)
     file << "    vbm unregistervm --delete $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
     file << "done < ${nodeinfo}\n"
     file << "rm -rf .vagrant/machines\n"
+    file << "echo \"Pruning machines from Vagrant registry...\"\n"
+    file << "vagrant global-status --prune\n"
   }
 end
 
