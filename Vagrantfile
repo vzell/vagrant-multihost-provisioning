@@ -869,11 +869,12 @@ def generate_natservice_stop(global, hosts)
   # Generate stop script
   File.open('stopVMs.sh', 'wb') { |file|
     file << "#!/bin/bash\n"
+    file << "shutdownmode=\"${1:-acpipowerbutton}\"\n"
     file << "nodeinfo=.nodeinfo\n"
-    file << "while read -r vm_name role hostname ip\n"
+    file << "while read -r vm_name role hostname ip gui\n"
     file << "do\n"
     file << "    echo \"Stopping ${vm_name}...\"\n"
-    file << "    vbm controlvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) acpipowerbutton\n"
+    file << "    vbm controlvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) ${shutdownmode}\n"
     file << "done < ${nodeinfo}\n"
   }
 end
