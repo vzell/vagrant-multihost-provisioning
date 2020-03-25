@@ -860,7 +860,7 @@ def generate_natservice_nodeinfo(global, hosts)
   # Generate nodeinfo
   File.open('.nodeinfo', 'wb') { |file|
     hosts.each do |host|
-      file << "#{host['vm_name']} #{host['role'] ? host['role'] : 'none'} #{host['hostname']} #{host['private_networks'][0]['ip']}\n"
+      file << "#{host['vm_name']} #{host['role'] ? host['role'] : 'none'} #{host['hostname']} #{host['private_networks'][0]['ip']} #{host['vm_gui'] ? host['vm_gui'] : 'false'}\n"
     end
   }
 end
