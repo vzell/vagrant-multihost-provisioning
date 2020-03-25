@@ -921,7 +921,7 @@ def generate_natservice_configure(global, hosts, natnetwork_name)
     file << "#!/bin/bash\n"
     file << "export natnetwork='#{natnetwork_name}'\n"
     file << "nodeinfo=.nodeinfo\n"
-    file << "while read -r vm_name role hostname ip\n"
+    file << "while read -r vm_name role hostname ip gui\n"
     file << "do\n"
     file << "    echo \"Removing NIC2 Host Only Adapter from ${vm_name}...\"\n"
     file << "    vbm modifyvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --nic2 none\n"
@@ -941,6 +941,9 @@ def generate_natservice_restart()
     file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
     file << "sleep 30s\n"
     file << "./.configureNATservice.sh\n"
+    file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
+    file << "sleep 30s\n"
+    file << "./moveVMs.sh\n"
     file << "echo 'Sleeping 30s to avoid locking issues with the VMs...'\n"
     file << "sleep 30s\n"
     file << "./startVMs.sh\n"
@@ -979,7 +982,27 @@ end
 
 # }}}
 
+# {{{ Generate helper scripts
+
+def generate_move_vms(global, hosts)
+  # Generate move script
+  destination=global['vm_basedir'] ? global['vm_basedir'] + global['vm_groups'].partition(',')[0] : "./.virtualbox" + global['vm_groups'].partition(',')[0]
+  File.open('moveVMs.sh', 'wb') { |file|
+    file << "#!/bin/bash\n"
+    file << "nodeinfo=.nodeinfo\n"
+    file << "destination=#{destination}\n"
+    file << "while read -r vm_name role hostname ip gui\n"
+    file << "do\n"
+    file << "    echo \"Moving ${vm_name} to ${destination}...\"\n"
+    file << "    vbm movevm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --type basic --folder \"${destination}\"\n"
+    file << "done < ${nodeinfo}\n"
+  }
+end
+
+# }}}
+
 if USE_NATSERVICE
+  generate_move_vms(global, hosts)
   generate_natservice_nodeinfo(global, hosts)
   generate_natservice_stop(global, hosts)
   generate_natservice_start(global, hosts)
