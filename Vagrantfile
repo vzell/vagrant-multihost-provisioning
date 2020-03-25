@@ -884,10 +884,14 @@ def generate_natservice_start(global, hosts)
   File.open('startVMs.sh', 'wb') { |file|
     file << "#!/bin/bash\n"
     file << "nodeinfo=.nodeinfo\n"
-    file << "while read -r vm_name role hostname ip\n"
+    file << "while read -r vm_name role hostname ip gui\n"
     file << "do\n"
     file << "    echo \"Starting ${vm_name}...\"\n"
-    file << "    vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --type headless\n"
+    file << "    if [ ${gui} == \"true\" ] ; then\n"
+    file << "        vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
+    file << "    else\n"
+    file << "        vbm startvm $(cat .vagrant/machines/${vm_name}/virtualbox/id) --type headless\n"
+    file << "    fi\n"
     file << "done < ${nodeinfo}\n"
   }
 end
