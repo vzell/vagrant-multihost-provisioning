@@ -900,11 +900,11 @@ def generate_natservice_destroy(global, hosts)
   # Generate destroy script
   File.open('destroyVMs.sh', 'wb') { |file|
     file << "#!/bin/bash\n"
-    file << "./stopVMs.sh\n"
+    file << "./stopVMs.sh poweroff\n"
     file << "echo 'Sleeping 40s to avoid locking issues with the VMs...'\n"
     file << "sleep 40s\n"
     file << "nodeinfo=.nodeinfo\n"
-    file << "while read -r vm_name role hostname ip\n"
+    file << "while read -r vm_name role hostname ip gui\n"
     file << "do\n"
     file << "    echo \"Destroying ${vm_name}...\"\n"
     file << "    vbm unregistervm --delete $(cat .vagrant/machines/${vm_name}/virtualbox/id)\n"
