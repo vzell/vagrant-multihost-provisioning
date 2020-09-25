@@ -1132,9 +1132,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vm_memory              = set_host_default(global, host, 'vm_memory',              1024)
       vm_cpus                = set_host_default(global, host, 'vm_cpus',                1)
       os_disk                = set_host_default(global, host, 'os_disk',                40)
-      hostname               = host['hostname'] ? host['hostname'] : host['vm_name']
-      hostname               = host.key?('domain') ? hostname + '.' + host['domain'] :
-                                 (global.key?('domain') ? hostname + '.' + global['domain'] : hostname)
+      # Could already be a fully qualified hostname or not
+      effective_hostname     = host['hostname'] ? host['hostname'] : host['vm_name']
+      # If domain is set either on global or host level, hostname is now fully qualified
+      hostname               = host.key?('domain') ? effective_hostname + '.' + host['domain'] :
+                                 (global.key?('domain') ? effective_hostname + '.' + global['domain'] : effective_hostname)
 
       if USE_PACKER
         box_url = "file://./boxes/package.box"
@@ -1169,7 +1171,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       if USE_HOSTMANAGER
         host_aliases = host.key?('aliases') ? host['aliases'].join(' ') : ''
-        host_alias   = (host.key?('domain') || global.key?('domain')) ? hostname : ''
+        # Set hostname without domain part as an alias if domain is explicitely set
+        host_alias   = (host.key?('domain') || global.key?('domain')) ? effective_hostname : ''
         if !([host_alias,host_aliases].reject(&:empty?).join(' ')).empty?
           node.hostmanager.aliases = [host_alias,host_aliases].reject(&:empty?).join(' ')
         end
