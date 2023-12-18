@@ -47,8 +47,8 @@ class VagrantPlugins::ProviderVirtualBox::Action::SetName
 
     controller_name = File.read(".controller.#{machine.name}")
 
-    vm_info             = driver.execute("showvminfo", uuid)
-    has_this_controller = vm_info.match("Storage Controller Name.*#{controller_name}")
+    vm_info = driver.execute('showvminfo', uuid, '--machinereadable')
+    has_this_controller = vm_info.match("storagecontrollername.*#{controller_name}")
 
     if has_this_controller
       ui.info "Machine #{machine.name} already has the '#{controller_name}' HDD controller"
