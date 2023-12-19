@@ -847,6 +847,7 @@ list element, other settings (see below) are optional:
 # Empty YAML array: comment THIS one when you uncomment/specify at least ONE VM specification below.
 #[]
 
+# vm_name:
 # This configuration section configures a list of VirtualBox VMs which should be created by Vagrant.
 # Every VM specification starts with the virtual machine name `vm_name`. This name is also shown in
 # the Oracle VM VirtualBox Manager GUI for the VM name.
@@ -905,7 +906,7 @@ list element, other settings (see below) are optional:
 #   public_networks:
 #     - ip: 192.168.2.90
 
-# forwarded_ports
+# forwarded_ports:
 # Vagrant `forwarded ports` allow you to access a port on your host machine and have all data forwarded
 # to a port on the guest machine, over either TCP or UDP.
 # Options:
