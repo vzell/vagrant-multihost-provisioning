@@ -532,7 +532,11 @@ def private_networks(vm, host)
       options[:mac]                = private_network['mac'].gsub(/[-:]/, '') if private_network.key?('mac')
       options[:auto_config]        = private_network['auto_config']          if private_network.key?('auto_config')
       options[:virtualbox__intnet] = private_network['intnet']               if private_network.key?('intnet')
-      vm.network :private_network, options
+      if Vagrant.version?(">= 2.3.5")
+        vm.network :private_network, **options
+      else
+        vm.network :private_network, options
+      end
     end
   end
 end
@@ -554,7 +558,11 @@ def public_networks(vm, host)
       options = {}
       options[:ip]          = public_network['ip']          if public_network.key?('ip') && public_network['ip'] != 'dhcp'
       options[:auto_config] = public_network['auto_config'] if public_network.key?('auto_config')
-      vm.network :public_network, options
+      if Vagrant.version?(">= 2.3.5")
+        vm.network :public_network, **options
+      else
+        vm.network :public_network, options
+      end
     end
   end
 end
