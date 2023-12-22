@@ -862,7 +862,7 @@ def controller_exists?(controller, vm_name)
   `#{vbm} showvminfo #{vm_name} --machinereadable 2>/dev/null | grep -e 'storagecontrollername[0-9]\+="#{controller}"' | wc -l`.to_i == 1
 end
 
-# Add a new controller to VM
+# Add a new storage controller to the VM
 def add_controller(host, global, vb, controller)
   if controller.start_with?("IDE")
     @ui.warn "Creating IDE controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
@@ -1288,7 +1288,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize ["modifyvm", :id, "--cpus",   vm_cpus]
         # Advanced Virtualbox VM options
         merge_vm_parameters(host, global, vb)
-        # Add an additional disk controller to the VM (alternative implementation which also works on WSL)
+        # Add an additional storage controller to the VM (alternative implementation which also works on WSL)
         add_controller(host, global, vb, controller) unless controller_exists?(controller, vm_name)
         # Add additional "Standard" disks to the VM, beside the system disk assumed to be on port 0
         merge_vm_disks(host, global, vb, controller)
