@@ -1197,7 +1197,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Generate the files with the disk controller name for each box
       # An inline plugin makes sure a disk controller with a given name is present in the VM
-      File.open(".controller.#{host['vm_name']}", "wb") { |file| file.write(controller) }
+      # ** Attention**: See the documentation of the inline plugin at the beginning of the file
+      #File.open(".controller.#{host['vm_name']}", "wb") { |file| file.write(controller) }
       
       if Vagrant.has_plugin?("vagrant-vbguest")
         node.vbguest.auto_update = vb_guest_auto_update
