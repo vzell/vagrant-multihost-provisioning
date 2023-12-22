@@ -1159,9 +1159,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
   config.vagrant.plugins = plugins
 
-  # Vagrant 1.7+ automatically inserts a different insecure keypair for each new
-  # VM created. The easiest way to use the same keypair for all the machines is
-  # to disable this feature and rely on the legacy insecure key.
+  # Vagrant 1.7+ automatically inserts a different insecure keypair for each new VM created. The easiest way to use the
+  # same keypair for all the machines is to disable this feature and rely on the legacy insecure key.
   config.ssh.insert_key  = false
   config.ssh.forward_x11 = SSH_FORWARD_X11
 
@@ -1275,7 +1274,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # VirtualBox Provider
       node.vm.provider :virtualbox do |vb|
-        # This options changes the properties of a registered virtual machine which is not running.
+        # This options change the properties of a registered virtual machine which is not running.
         # Standard Virtualbox VM options
         vb.gui = vm_gui
         vb.auto_nat_dns_proxy = vm_auto_nat_dns_proxy
