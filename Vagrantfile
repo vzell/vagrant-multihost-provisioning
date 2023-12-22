@@ -28,54 +28,59 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 SCRIPT
 
-# Inline plugin which makes sure a disk controller with the given name is present in the VM
-# in case we want to add additional virtual disks to the VMs.
-class VagrantPlugins::ProviderVirtualBox::Action::SetName
-  alias_method :original_call, :call
-  def call(env)
-    machine = env[:machine]
-    driver  = machine.provider.driver
-    uuid    = driver.instance_eval { @uuid }
-    ui      = env[:ui]
+# Inline plugin which makes sure a disk controller with the given name is present in the VM in case we want to add
+# additional virtual disks to the VMs.
+#
+# ** ATTENTION **: When vagrant is called from an WSL environment, this plugin will be called in an endless loop. An
+# alternative implementation is now used which works also inside of WSL, see the functions `controller_exists?` and
+# `add_controller`.
 
-    # puts "MACHINE"
-    # puts env[:machine].inspect
-    # puts "MACHINE.config"
-    # puts env[:machine].config.inspect
-    # puts "GLOBAL"
-    # puts env[:global_config].inspect
-
-    controller_name = File.read(".controller.#{machine.name}")
-
-    vm_info = driver.execute('showvminfo', uuid, '--machinereadable')
-    has_this_controller = vm_info.match("storagecontrollername.*#{controller_name}")
-
-    if has_this_controller
-      ui.info "Machine #{machine.name} already has the '#{controller_name}' HDD controller"
-    else
-      if controller_name.start_with?("IDE")
-        ui.warn "Creating IDE controller with name '#{controller_name}' on machine #{machine.name}..."
-        driver.execute('storagectl', uuid,
-                       '--name',       "#{controller_name}",
-                       '--add',        'ide',
-                       '--controller', 'PIIX4')
-      elsif controller_name.start_with?("SCSI")
-        ui.warn "Creating SCSI controller with name '#{controller_name}' on machine #{machine.name}..."
-        driver.execute('storagectl', uuid,
-                       '--name',       "#{controller_name}",
-                       '--add',        'scsi',
-                       '--controller', 'LSILogic')
-      else
-        ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
-        driver.execute('storagectl', uuid,
-                       '--name',       "#{controller_name}",
-                       '--add',        'sata',
-                       '--controller', 'IntelAhci')
-      end
-    end
-    original_call(env)
-  end
-end
+#class VagrantPlugins::ProviderVirtualBox::Action::SetName
+#  alias_method :original_call, :call
+#  def call(env)
+#    machine = env[:machine]
+#    driver  = machine.provider.driver
+#    uuid    = driver.instance_eval { @uuid }
+#    ui      = env[:ui]
+#
+#    # puts "MACHINE"
+#    # puts env[:machine].inspect
+#    # puts "MACHINE.config"
+#    # puts env[:machine].config.inspect
+#    # puts "GLOBAL"
+#    # puts env[:global_config].inspect
+#
+#    controller_name = File.read(".controller.#{machine.name}")
+#
+#    vm_info = driver.execute('showvminfo', uuid, '--machinereadable')
+#    has_this_controller = vm_info.match("storagecontrollername.*#{controller_name}")
+#
+#    if has_this_controller
+#      ui.info "Machine #{machine.name} already has the '#{controller_name}' HDD controller"
+#    else
+#      if controller_name.start_with?("IDE")
+#        ui.warn "Creating IDE controller with name '#{controller_name}' on machine #{machine.name}..."
+#        driver.execute('storagectl', uuid,
+#                       '--name',       "#{controller_name}",
+#                       '--add',        'ide',
+#                       '--controller', 'PIIX4')
+#      elsif controller_name.start_with?("SCSI")
+#        ui.warn "Creating SCSI controller with name '#{controller_name}' on machine #{machine.name}..."
+#        driver.execute('storagectl', uuid,
+#                       '--name',       "#{controller_name}",
+#                       '--add',        'scsi',
+#                       '--controller', 'LSILogic')
+#      else
+#        ui.warn "Creating SATA controller with name '#{controller_name}' on machine #{machine.name}..."
+#        driver.execute('storagectl', uuid,
+#                       '--name',       "#{controller_name}",
+#                       '--add',        'sata',
+#                       '--controller', 'IntelAhci')
+#      end
+#    end
+#    original_call(env)
+#  end
+#end
 
 VAGRANTFILE_API_VERSION = '2'
 
@@ -106,12 +111,34 @@ end
 
 # {{{ Helper functions
 
+# Define shortcuts for platforms
+def linux_host?
+  Vagrant::Util::Platform.linux?
+end
+
+def wsl_host?
+  Vagrant::Util::Platform.wsl?
+end
+
+def mac_host?
+  Vagrant::Util::Platform.darwin?
+end
+
 def windows_host?
   Vagrant::Util::Platform.windows?
 end
 
 def cygwin_host?
   Vagrant::Util::Platform.cygwin?
+end
+
+# Set name of VBoxManage executable depending on platform
+def vbm
+  vbm="vboxmanage"
+  if wsl_host? or windows_host? or cygwin_host?
+    vbm="VBoxManage.exe"
+  end
+  return vbm
 end
 
 def run_locally?
@@ -827,6 +854,25 @@ def merge_vm_parameters(host, global, vb)
   end
 end
 
+# Check for existing controller in VM
+def controller_exists?(controller, vm_name)
+  `#{vbm} showvminfo #{vm_name} --machinereadable 2>/dev/null | grep "storagecontrollername.*=\"#{controller}\"" | wc -l`.to_i == 1
+end
+
+# Add a new controller to VM
+def add_controller(host, global, vb, controller)
+  if controller.start_with?("IDE")
+    @ui.warn "Creating IDE controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
+    vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'ide',  '--controller', 'PIIX4']
+  elsif controller.start_with?("SCSI")
+    @ui.warn "Creating SCSI controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
+    vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'scsi', '--controller', 'LSILogic']
+  else
+    @ui.warn "Creating SATA controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
+    vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'sata', '--controller', 'IntelAhci']
+  end
+end
+
 # Create new "Standard" disks and attach them to a disk controller.
 # Disk information is merged from the global and VM specific section.
 def merge_vm_disks(host, global, vb, controller)
@@ -1239,6 +1285,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize ["modifyvm", :id, "--cpus",   vm_cpus]
         # Advanced Virtualbox VM options
         merge_vm_parameters(host, global, vb)
+        # Add an additional disk controller to the VM (alternative implementation which also works on WSL)
+        add_controller(host, global, vb, controller) unless controller_exists?(controller, vm_name)
         # Add additional "Standard" disks to the VM, beside the system disk assumed to be on port 0
         merge_vm_disks(host, global, vb, controller)
         # Add additional "Fixed Shared" disks to the VM, beside the system disk assumed to be on port 0
