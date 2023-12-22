@@ -1174,7 +1174,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # Initialize host specific environment from Vagrant configuration or use sensible defaults
       controlhost            = set_host_default(global, host, 'controlhost',            false)
-      box                    = set_host_default(global, host, 'box',                    'centos/7')
+      box                    = set_host_default(global, host, 'box',                    'boxomatic/centos-7')
       box_url                = get_config_parameter(host, global, 'box_url')
       box_version            = get_config_parameter(host, global, 'box_version')
       box_check_update       = set_host_default(global, host, 'box_check_update',       true)
