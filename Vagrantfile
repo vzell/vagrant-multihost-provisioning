@@ -355,9 +355,9 @@ roles_path = ./ansible/roles
 
 [ssh_connection]
 # ssh arguments to use (`ControlMaster=no` is needed for Ansible to work on Cygwin).
-ssh_args = -o ControlMaster=no
+#ssh_args = -o ControlMaster=no
 # ssh arguments to use on Unix systems
-#ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes
 FILE
     File.open(ANSIBLE_FOLDER + ANSIBLE_CFG, "wb") { |file| file.write(ansible_cfg) } if !File.file?(ANSIBLE_FOLDER + ANSIBLE_CFG)
 end
