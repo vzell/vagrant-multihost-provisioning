@@ -870,9 +870,11 @@ def add_controller(host, global, vb, controller)
   elsif controller.start_with?("SCSI")
     @ui.warn "Creating SCSI controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
     vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'scsi', '--controller', 'LSILogic']
-  else
+  elsif controller.start_with?("SATA")
     @ui.warn "Creating SATA controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
     vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'sata', '--controller', 'IntelAhci']
+  elsif controller.start_with?("no controller")
+    @ui.warn "No need to add any storage controller" if VAGRANT_UI_VERBOSE
   end
 end
 
