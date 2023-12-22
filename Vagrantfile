@@ -859,7 +859,7 @@ end
 
 # Check for existing controller in VM
 def controller_exists?(controller, vm_name)
-  `#{vbm} showvminfo #{vm_name} --machinereadable 2>/dev/null | grep "storagecontrollername.*=\"#{controller}\"" | wc -l`.to_i == 1
+  `#{vbm} showvminfo #{vm_name} --machinereadable 2>/dev/null | grep -e 'storagecontrollername[0-9]\+="#{controller}"' | wc -l`.to_i == 1
 end
 
 # Add a new controller to VM
