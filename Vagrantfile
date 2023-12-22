@@ -309,7 +309,7 @@ end
 
 def generate_ansible_configfiles(ansible_cfgs)
   if ansible_cfgs.nil?
-    # In case there is NO config information...
+    # In case there is NO config information in the configuration file ... assume a linux like system
     ansible_cfg = <<-FILE
 [defaults]
 # Disable SSH key host checking
@@ -323,7 +323,8 @@ FILE
     # Otherwise,... generate the Ansible configuration file for `ansible_local` mode provisioner
     File.open(ANSIBLE_FOLDER + ANSIBLE_LOCAL_CONFIG, "wb") { |file| file.write(ansible_cfg) }
 
-    ansible_cfg=  <<-FILE
+    if cygwin_host?
+      ansible_cfg=  <<-FILE
 [defaults]
 # Disable SSH key host checking
 host_key_checking = no
@@ -336,6 +337,8 @@ roles_path = ./ansible/roles
 # Vagrant uses ANSIBLE_SSH_ARGS for Cygwin which has higher precedence than Ansible configuration options.
 ssh_args = -o ControlMaster=no
 FILE
+    end
+
     # Otherwise,... generate the Ansible configuration file for `ansible` mode provisioner
     File.open(ANSIBLE_FOLDER + ANSIBLE_CONFIG, "wb") { |file| file.write(ansible_cfg) }
   else
