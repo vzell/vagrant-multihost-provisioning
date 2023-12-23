@@ -504,15 +504,16 @@ def provision_ansible(vm, host, global)
     # This does not currently work when task names have blanks in their name on the Cygwin platform
     ansible.start_at_task       = get_global_parameter(global, 'ANSIBLE_START_AT_TASK')
     ansible.vault_password_file = ANSIBLE_VAULT_PASSWORD_FILE
-    if ansible_mode == 'ansible' && cygwin_host?
+    if ansible_mode == 'ansible'
       ansible.raw_arguments     = ANSIBLE_RAW_ARGS
-      ansible.raw_ssh_args      = ['-o ControlMaster=no']
+      if cygwin_host?
+        ansible.raw_ssh_args    = ['-o ControlMaster=no']
+      end
       ansible.galaxy_role_file  = ANSIBLE_FOLDER + ANSIBLE_GALAXY_ROLE_FILE
       ansible.config_file       = ANSIBLE_FOLDER + ANSIBLE_CONFIG
       ansible.inventory_path    = ANSIBLE_FOLDER + ANSIBLE_INVENTORY
       ansible.playbook          = ANSIBLE_FOLDER + '.' + ANSIBLE_PLAYBOOK_PREFIX + ANSIBLE_PLAYBOOK
-    end
-    if ansible_mode == 'ansible_local'
+    elsif ansible_mode == 'ansible_local'
       ansible.install           = ANSIBLE_INSTALL
       ansible.install_mode      = ANSIBLE_INSTALL_MODE
       ansible.pip_args          = ANSIBLE_PIP_ARGS
