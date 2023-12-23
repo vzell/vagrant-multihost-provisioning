@@ -628,25 +628,28 @@ vm_options:
   - { rtcuseutc: "on" }
   - { ioapic:    "on" }
 
-# Specifies the name of the disk Controller (which will be created if it doesn't exist in the VM), in case we want
-# to add additional virtual disks to the VMs. The controller name MUST start with either `SATA`, `SCSI` or `IDE`.
-# In case of SATA most of the boxes use the name `SATA Controller`, but some boxes out there instead have a controller
-# named `SATAController`.
+# Specifies the name of the storage controller, in case we want to add additional virtual disks to the VM. The
+# controller name MUST start with either `SATA`, `SCSI` or `IDE`.  In case of SATA most of the boxes use the name `SATA Controller`,
+# but some boxes out there instead have a controller named `SATAController`.
 # Defaults to `SATA Controller`.
 controller: "SATAController"
 
-# List of "Standard" dynamically allocated disks which should be attached to a SATA controller.
+# In case the box doesn't have a storage controller with the the name in the above `controller` variable we can specify a value of `true` to create it.
+# Defaults to `false`.
+create_controller: true
+
+# List of "Standard" dynamically allocated disks which should be attached to the storage controller.
 # These will initially be very small and not occupy any space for unused virtual disk sectors, but will grow every
 # time a disk sector is written to for the first time, until the drive reaches the maximum capacity chosen when the drive was created.
-# First parameter specifies the `SATA port` to attach the disk, second parameter specifies the `disksize` in GB.
+# The first parameter specifies the `storage controler port` to attach the disk, the second parameter specifies the `disksize` in GB.
 # Defaults to `nil`.
 vm_disks:
   - { 1: 2000 }
   - { 2: 2000 }
 
-# List of "Fixed Shared" disks which should be attached to a SATA controller.
+# List of "Fixed Shared" disks which should be attached to the storage controller.
 # Image files will be created on your host system which have roughly the same size as the virtual disk's capacity.
-# First parameter specifies the `SATA port` to attach the disk, second parameter specifies the `disksize` in GB.
+# The first parameter specifies the `storage controller port` to attach the disk, the second parameter specifies the `disksize` in GB.
 # Can be useful when creating Oracle RAC environments.
 # Defaults to `nil`.
 vm_shared_disks:

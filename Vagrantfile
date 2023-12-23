@@ -874,8 +874,6 @@ def add_controller(host, global, vb, controller)
   elsif controller.start_with?("SATA")
     @ui.warn "Creating SATA controller with name '#{controller}'" if VAGRANT_UI_VERBOSE
     vb.customize ['storagectl', :id, '--name', "#{controller}", '--add', 'sata', '--controller', 'IntelAhci']
-  elsif controller.start_with?("no controller")
-    @ui.warn "No need to add any storage controller" if VAGRANT_UI_VERBOSE
   end
 end
 
@@ -1184,6 +1182,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       box_vagrantfile_ignore = set_host_default(global, host, 'box_vagrantfile_ignore', true)
       vb_guest_auto_update   = set_host_default(global, host, 'vb_guest_auto_update',   true)
       controller             = set_host_default(global, host, 'controller',             'SATA Controller')
+      create_controller      = set_host_default(global, host, 'create_controller',      false)
       vm_gui                 = set_host_default(global, host, 'vm_gui',                 false)
       vm_auto_nat_dns_proxy  = set_host_default(global, host, 'vm_auto_nat_dns_proxy',  true)
       vm_name                = set_host_default(global, host, 'vm_name',                host['vm_name'])
@@ -1292,7 +1291,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # Advanced Virtualbox VM options
         merge_vm_parameters(host, global, vb)
         # Add an additional storage controller to the VM (alternative implementation which also works on WSL)
-        add_controller(host, global, vb, controller) unless controller_exists?(controller, vm_name)
+        add_controller(host, global, vb, controller) if create_controller
         # Add additional "Standard" disks to the VM, beside the system disk assumed to be on port 0
         merge_vm_disks(host, global, vb, controller)
         # Add additional "Fixed Shared" disks to the VM, beside the system disk assumed to be on port 0
