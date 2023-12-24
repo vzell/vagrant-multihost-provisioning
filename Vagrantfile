@@ -134,9 +134,9 @@ end
 
 # Set name of VBoxManage executable depending on platform
 def vbm
-  vbm="vboxmanage"
+  vbm = "vboxmanage"
   if wsl_host? or windows_host? or cygwin_host?
-    vbm="VBoxManage.exe"
+    vbm = "VBoxManage.exe"
   end
   return vbm
 end
