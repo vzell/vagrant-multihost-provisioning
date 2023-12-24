@@ -141,6 +141,13 @@ def vbm
   return vbm
 end
 
+# Check for IP address of WSL "Ethernet adapter vEthernet (WSL)" network adapter
+def wsl_ip_address
+  wsl_ip_address = `awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null`
+  @ui.warn("IP address of 'Ethernet adapter vEthernet (WSL)' appears to be: #{wsl_ip_address}")  if VAGRANT_UI_VERBOSE
+  return wsl_ip_address.strip
+end
+
 def run_locally?
   # Pretend that Cygwin is NOT Windows, it's POSIX
   windows_host? && !cygwin_host? || FORCE_LOCAL_RUN
@@ -449,9 +456,17 @@ def generate_ansible_inventory(global, hosts, inventory_groupings)
         end
       end
       if python_interpreter
-        file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key' ansible_python_interpreter=#{python_interpreter}\n")
+        if wsl_host?
+          file.write("#{hostname} ansible_ssh_host=#{wsl_ip_address} ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key' ansible_python_interpreter=#{python_interpreter}\n")
+        else
+          file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key' ansible_python_interpreter=#{python_interpreter}\n")
+        end
       else
-        file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key'\n")
+        if wsl_host?
+          file.write("#{hostname} ansible_ssh_host=#{wsl_ip_address} ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key'\n")
+        else
+          file.write("#{hostname} ansible_ssh_host=127.0.0.1 ansible_ssh_port=#{ansible_ssh_port} ansible_ssh_user=#{VAGRANT_USER} ansible_ssh_private_key_file='../.vagrant/insecure_private_key'\n")
+        end
       end
     end
   }
