@@ -144,7 +144,7 @@ end
 # Check for IP address of WSL "Ethernet adapter vEthernet (WSL)" network adapter
 def wsl_ip_address
   wsl_ip_address = `awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null`
-  @ui.warn("IP address of 'Ethernet adapter vEthernet (WSL)' appears to be: #{wsl_ip_address}")  if VAGRANT_UI_VERBOSE
+  @ui.warn("IP address of 'Ethernet adapter vEthernet (WSL)' appears to be: #{wsl_ip_address}") if VAGRANT_UI_VERBOSE
   return wsl_ip_address.strip
 end
 
