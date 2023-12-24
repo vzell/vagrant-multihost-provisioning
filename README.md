@@ -130,18 +130,16 @@ cases with Ansible.
 
 To give you an idea of how this works lets look at a couple of simple configurations:
 
-The default configuration above will result in a *single* VirtualBox VM running
-Centos/7 (downloaded from the [HashiCorp Cloud](https://app.vagrantup.com/boxes/search))
-with 1 virtual CPU and 1 GB of memory. The VM has access to the internet via a NAT network adapter.
-There is no provisioning taking place.
+The default configuration above will result in a *single* VirtualBox VM running **CentOS Linux release 7.9.2009 (Core)**
+(downloaded from the [HashiCorp Cloud](https://app.vagrantup.com/boxes/search)) with **1 virtual CPU**, **1 GB of
+memory** and a **SATA storage adapter** with a **thin provisoned disk of 20 GB on SATA port 0**. The VM has access to
+the internet via a **NAT network adapter**.  There is **no provisioning** taking place.
 
-An example of a trivial *multihost* VM setup follows. In this case the VMs will
-be setup with a VirtualBox Host-Only adapter given the specified IPs. SSH setup
-between the nodes is available.
+An example of a trivial *multihost* VM setup follows. In this case the VMs will be setup with a VirtualBox **Host-Only
+network adapter** given the specified IPs. **SSH setup** between the nodes is available.
 
-NOTE that in the case of a *multihost* setup you need to specify the Ansible
-controlhost (whatever you name it) as the LAST ONE in the list of VMs if you
-want to provision with Ansible in *ansible_local mode* AND the **controlhost**
+NOTE that in the case of a *multihost* setup you need to specify the Ansible controlhost (whatever you name it) as the
+**LAST ONE** in the list of VMs if you want to provision with Ansible in *ansible_local mode* AND the **controlhost**
 attribute MUST be set to `true`.
 
 ```Yaml
