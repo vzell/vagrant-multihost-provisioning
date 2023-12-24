@@ -1,10 +1,9 @@
 Multihost Virtual Machine Provisioning powered by Vagrant
 =========================================================
 
-A skeleton repository that considerably simplifies setting up a multihost
-project with a VirtualBox Virtual Machine development environment powered by
-[Vagrant](https://www.vagrantup.com/) and different provisioners like File,
-Shell and [Ansible](https://www.ansible.com/).
+A skeleton repository that considerably simplifies setting up a multihost project with a VirtualBox Virtual Machine
+development environment powered by [Vagrant](https://www.vagrantup.com/) and different provisioners like File, Shell and
+[Ansible](https://www.ansible.com/).
 
 Advantages include:
 
@@ -14,39 +13,36 @@ Advantages include:
   in a single [YAML](https://yaml.org/) file with different document sections, eg. hosts and Ansible role
   requirements plus Ansible playbook instructions.
 
-Setting up a multi-VM Vagrant environment with Ansible provisioning becomes
-almost trivial.
+Setting up a multi-VM Vagrant environment with Ansible provisioning becomes almost trivial.
 
 The Vagrant Ansible provisioning process can run in either:
 
 [ansible mode](https://www.vagrantup.com/docs/provisioning/ansible.html) (on Unix/Cygwin/MacOS Vagrant host)
 
-The Vagrant Ansible provisioner allows you to provision the guest(s) using Ansible
-playbooks by executing `ansible-playbook` from the Vagrant host.
+The Vagrant Ansible provisioner allows you to provision the guest(s) using Ansible playbooks by executing
+`ansible-playbook` from the Vagrant host.
 
 or
 
 [ansible_local mode](https://www.vagrantup.com/docs/provisioning/ansible_local.html) (on Windows Vagrant host)
 
-The Vagrant Ansible Local provisioner allows you to provision the guest(s) using
-Ansible playbooks by executing `ansible-playbook` directly on the guest machine.
+The Vagrant Ansible Local provisioner allows you to provision the guest(s) using Ansible playbooks by executing
+`ansible-playbook` directly on the guest machine.
 
 ## Prerequisites
 
-If your management node is Windows, make sure you have installed recent versions
-of
+If your management node is Windows, make sure you have installed recent versions of
 
 - [VirtualBox](https://virtualbox.org/)
 - [Vagrant](https://vagrantup.com/)
 - [Git](https://git-scm.com/) - if you want to clone this project
 
-If you're using [Cygwin](https://cygwin.com/) installed on your management node
-under Windows, you'll find a complete setup and installation guide (and more) at
+If you're using [Cygwin](https://cygwin.com/) installed on your management node under Windows, you'll find a complete
+setup and installation guide (and more) at
 
 [DevOps: Setup and Running Everything under Cygwin on Windows](https://git.volkerzell.de/devops-cygwin/).
 
-If your management node is Unix, make sure you have additionally installed
-recent versions of
+If your management node is Unix, make sure you have additionally installed recent versions of
 
 - [Ansible](https://www.ansible.com/)
 - [Git](https://git-scm.com/)
@@ -65,13 +61,11 @@ cd my-project
 
 ## Getting started
 
-After cloning this repository there is a single configuration file
-`vagrant-conf.yml` which should be adjusted for your project. The file has
-different document sections which drives the installation, configuration and
-provisioning process of the virtual machines.
+After cloning this repository there is a single configuration file `vagrant-conf.yml` which should be adjusted for your
+project. The file has different document sections which drives the installation, configuration and provisioning process
+of the virtual machines.
 
-After having done the adjustments you can startup and provision your whole VM
-environment with a simple
+After having done the adjustments you can startup and provision your whole VM environment with a simple
 
 ```bash
 vagrant up
@@ -91,12 +85,10 @@ vagrant provision
 
 ## The Vagrant configuration file
 
-The `vagrant-conf.yml` file consists of seven YAML document sections, 5 YAML
-dicts and 2 YAML lists, which are empty by default (which means they ALL use
-sensible defaults). You probably only need to change section (1) and (2) when
-configuring a multihost scenario and (3-5) in case you're using the Ansible
-provisioner. Sections (6) and (7) are optional and only used for advanced use
-cases with Ansible.
+The `vagrant-conf.yml` file consists of seven YAML document sections, 5 YAML dicts and 2 YAML lists, which are empty by
+default (which means they ALL use sensible defaults). You probably only need to change section (1) and (2) when
+configuring a multihost scenario and (3-5) in case you're using the Ansible provisioner. Sections (6) and (7) are
+optional and only used for advanced use cases with Ansible.
 
 ```Yaml
 --- # (1) Global parameters for all VMs to be created by Vagrant
@@ -209,8 +201,7 @@ site.yml: |
 ...
 ```
 
-The below example is for an [ELK stack](https://www.elastic.co/elk-stack)
-provisioning on a *single* node.
+The below example is for an [ELK stack](https://www.elastic.co/elk-stack) provisioning on a *single* node.
 
 ```Yaml
 --- # (1) Global parameters for all VMs to be created by Vagrant
@@ -298,8 +289,7 @@ Configuration file YAML document sections
 
 ## (1) Global parameters for all VMs to be created by Vagrant
 
-The `first YAML document section` specifies global parameters for all the nodes
-that are controlled by Vagrant.
+The `first YAML document section` specifies global parameters for all the nodes that are controlled by Vagrant.
 
 ```Yaml
 ---
@@ -839,9 +829,8 @@ scripts_never:
 
 ## (2) List of virtual machines to be created by Vagrant
 
-The `second YAML document section` specifies list of VirtualBox VMs that are controlled
-by Vagrant as a YAML list. You should at least specify a `vm_name` attribute for each
-list element, other settings (see below) are optional:
+The `second YAML document section` specifies list of VirtualBox VMs that are controlled by Vagrant as a YAML list. You
+should at least specify a `vm_name` attribute for each list element, other settings (see below) are optional:
 
 ```Yaml
 ---
@@ -982,8 +971,8 @@ list element, other settings (see below) are optional:
 
 ## (3) Ansible inventory groupings to be appended to autogenerated Ansible inventory files
 
-The `third YAML document section` specifies the Ansible inventory groupings to
-be appended to the autogenerated Ansible inventory files.
+The `third YAML document section` specifies the Ansible inventory groupings to be appended to the autogenerated Ansible
+inventory files.
 
 ```Yaml
 ---
@@ -1048,10 +1037,9 @@ groupings: |
 
 ## (4) List of required roles for installation with `ansible-galaxy` for Ansible provisioning
 
-The `fourth YAML document section` specifies the (optional) list of required
-roles which [ansible-galaxy](https://galaxy.ansible.com/) should install before
-Ansible provisioning is started on the VMs. The default list is the empty YAML
-list "[]".
+The `fourth YAML document section` specifies the (optional) list of required roles which
+[ansible-galaxy](https://galaxy.ansible.com/) should install before Ansible provisioning is started on the VMs. The
+default list is the empty YAML list "[]".
 
 ```Yaml
 ---
@@ -1131,18 +1119,17 @@ list "[]".
 
 The `fifth YAML document section` specifies the Ansible playbook section. 
 
-The `ansible/` subdirectory in the project folder contains the Ansible
-configuration, and should be structured according to
-[Ansible's best practices](https://docs.ansible.com/ansible/playbooks_best_practices.html).
+The `ansible/` subdirectory in the project folder contains the Ansible configuration, and should be structured according
+to [Ansible's best practices](https://docs.ansible.com/ansible/playbooks_best_practices.html).
 
-If you have specified ansible-galaxy installable roles in the `fourth YAML
-document section` of the Vagrant configuration file above, the `ansible/roles`
-directory structure will automatically be populated (via ansible-galaxy) during
-the `vagrant up` or `vagrant provision` run.
+If you have specified ansible-galaxy installable roles in the `fourth YAML document section` of the Vagrant
+configuration file above, the `ansible/roles` directory structure will automatically be populated (via ansible-galaxy)
+during the `vagrant up` or `vagrant provision` run.
 
 See also 
-[Playbooks Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html) and
-[Reusing roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
+
+ - [Playbooks Best Practices](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html)
+ - [Reusing roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
 
 ```Yaml
 ---
@@ -1340,8 +1327,8 @@ for the two different Ansible provisioning modes.
 Running Vagrant with a custom configuration file
 ================================================
 
-Instead of using the default `vagrant-conf.yml` file you can use an arbitrary
-filename, just specify it in the environment variable `VAGRANT_CONF`:
+Instead of using the default `vagrant-conf.yml` file you can use an arbitrary filename, just specify it in the
+environment variable `VAGRANT_CONF`:
 
 ```ShellSession
 VAGRANT_CONF='custom-vagrant-conf.yml' vagrant up
