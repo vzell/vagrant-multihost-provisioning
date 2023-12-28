@@ -578,6 +578,7 @@ vm_basedir: "C:/vm/virtualbox"
 
 # VirtualBox machines are started in headless mode, meaning there is no UI for the machines visible on the host machine.
 # Common use cases for wanting a UI include wanting to see a browser that may be running in the machine, or debugging a strange boot issue.
+# NOTE: When running under WSL this option doesn't allow to SSH into the box, so it will be ignored when set.
 # Defaults to `false`.
 vm_gui: true
 

@@ -1295,9 +1295,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       # VirtualBox Provider
       node.vm.provider :virtualbox do |vb|
-        # This options change the properties of a registered virtual machine which is not running.
+        # The following options change the properties of a registered virtual machine which is not running.
         # Standard Virtualbox VM options
-        vb.gui = vm_gui
+        if wsl_host?
+          # When running under WSL the GUI mode option doesn't allow to SSH into the box
+          vb.gui = false
+        else
+          vb.gui = vm_gui
+        end
         vb.auto_nat_dns_proxy = vm_auto_nat_dns_proxy
         vb.customize ["modifyvm", :id, "--name",   vm_name]
         vb.customize ["modifyvm", :id, "--groups", vm_groups]
